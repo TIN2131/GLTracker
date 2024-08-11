@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Judith's Lens - Capturing Life's Beautiful Moments</title>
     <meta name="description" content="Judith's Lens - Professional photography services for portraits, landscapes, and events. Explore our stunning portfolio and book your session today.">
+    
+    <!-- Include Google Fonts for better typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Include FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
     <style>
         /* CSS Reset and Base Styles */
         * {
@@ -15,16 +21,18 @@
         }
         
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Open Sans', Arial, sans-serif;
             line-height: 1.6;
             color: #333;
-            background-color: #fff;
+            background-color: #f5f5f5;
         }
 
         /* Typography */
         h1, h2, h3 {
-            font-weight: 300;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
             margin-bottom: 1rem;
+            color: #222;
         }
 
         h1 { font-size: 2.5rem; }
@@ -39,6 +47,7 @@
             --accent-color: #9D3C55;
             --text-color: #333333;
             --background-color: #FFFFFF;
+            --gray-color: #888;
         }
 
         /* Layout */
@@ -56,6 +65,7 @@
             width: 100%;
             z-index: 1000;
             padding: 1rem 0;
+            transition: background-color 0.3s ease;
         }
 
         nav {
@@ -64,64 +74,16 @@
             align-items: center;
         }
 
-        /* Enhanced Logo Styles */
         .logo {
-            font-size: 2.5rem;
-            font-weight: bold;
+            font-size: 2rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
             color: var(--primary-color);
             text-decoration: none;
-            position: relative;
-            display: inline-block;
-            padding: 10px 20px;
-            transition: all 0.3s ease;
-            animation: popIn 1s ease-out;
+            transition: color 0.3s ease;
         }
 
-        .logo::before, .logo::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--secondary-color);
-            z-index: -1;
-            transition: all 0.3s ease;
-        }
-
-        .logo::before {
-            transform: skew(-10deg);
-        }
-
-        .logo::after {
-            transform: skew(10deg);
-        }
-
-        .logo:hover {
-            transform: scale(1.05);
-        }
-
-        .logo:hover::before {
-            transform: skew(-15deg);
-        }
-
-        .logo:hover::after {
-            transform: skew(15deg);
-        }
-
-        @keyframes popIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.5);
-            }
-            70% {
-                transform: scale(1.1);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
+        .logo:hover { color: var(--accent-color); }
 
         .nav-links {
             display: flex;
@@ -132,6 +94,7 @@
 
         .nav-links a {
             color: var(--text-color);
+            font-weight: 600;
             text-decoration: none;
             transition: color 0.3s ease;
         }
@@ -143,89 +106,55 @@
             height: 100vh;
             position: relative;
             overflow: hidden;
-        }
-
-        .slideshow {
-            height: 100%;
-            display: flex;
-            transition: transform 0.5s ease-in-out;
-        }
-
-        .slide {
-            min-width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
             display: flex;
             align-items: center;
             justify-content: center;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-            position: absolute;
-            top: 0;
-            left: 0;
+            background: linear-gradient(120deg, var(--primary-color) 30%, var(--accent-color) 70%);
+            color: #fff;
+            text-align: center;
+            padding: 0 2rem;
         }
 
-        .slide.active { opacity: 1; }
-
         .hero-content {
-            text-align: center;
-            color: #fff;
-            background-color: rgba(209, 77, 114, 0.7);
-            padding: 2rem;
-            border-radius: 5px;
             max-width: 600px;
-            margin: 0 auto;
+            animation: fadeIn 1.5s ease-in-out;
         }
 
         .hero h1 {
             font-size: 3rem;
             margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .slideshow-nav {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 1rem;
-            z-index: 10;
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
         }
 
-        .slideshow-nav button {
-            background-color: rgba(255,255,255,0.5);
+        .cta-button {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
             border: none;
-            width: 1rem;
-            height: 1rem;
-            border-radius: 50%;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
-        .slideshow-nav button.active { background-color: #fff; }
-
-        .slideshow-arrows {
-            position: absolute;
-            top: 50%;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            z-index: 10;
+        .cta-button:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-5px);
         }
 
-        .slideshow-arrows button {
-            background-color: rgba(209, 77, 114, 0.7);
-            color: #fff;
-            border: none;
-            font-size: 2rem;
-            padding: 1rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .slideshow-arrows button:hover {
-            background-color: rgba(209, 77, 114, 0.9);
+        /* Keyframes for animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Portfolio Section */
@@ -238,6 +167,8 @@
             text-align: center;
             margin-bottom: 2rem;
             color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .gallery {
@@ -251,6 +182,7 @@
             overflow: hidden;
             border-radius: 5px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
         }
 
         .gallery-item img {
@@ -259,44 +191,96 @@
             transition: transform 0.3s ease;
         }
 
+        .gallery-item:hover { transform: scale(1.05); }
         .gallery-item:hover img { transform: scale(1.1); }
 
         /* About Section */
         .about {
             padding: 4rem 0;
             background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
         }
 
         .about-content {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            flex-direction: column;
+            max-width: 800px;
+            margin-bottom: 2rem;
         }
 
-        .about-image { width: 100%; }
+        .about h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .about p {
+            font-size: 1.1rem;
+            color: var(--gray-color);
+        }
 
         .about-image img {
-            width: 100%;
-            height: auto;
             border-radius: 5px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 100%;
+            height: auto;
         }
 
-        .about-text { width: 100%; }
+        /* Testimonials Section */
+        .testimonials {
+            padding: 4rem 0;
+            background-color: var(--secondary-color);
+            text-align: center;
+        }
 
-        .about-text h2 { color: var(--primary-color); }
+        .testimonials h2 {
+            text-transform: uppercase;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
+        }
+
+        .testimonial-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .testimonial-card {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 2rem;
+            max-width: 300px;
+            transition: transform 0.3s ease;
+        }
+
+        .testimonial-card:hover { transform: translateY(-5px); }
+
+        .testimonial-card p {
+            color: var(--gray-color);
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-card .client-name {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
 
         /* Contact Section */
         .contact {
             padding: 4rem 0;
-            background-color: var(--secondary-color);
+            background-color: var(--primary-color);
+            color: #fff;
+            text-align: center;
         }
 
         .contact h2 {
-            text-align: center;
             margin-bottom: 2rem;
-            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .contact-form {
@@ -304,52 +288,40 @@
             margin: 0 auto;
         }
 
-        .form-group { margin-bottom: 1rem; }
+        .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
 
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: var(--text-color);
         }
 
         .form-group input,
         .form-group textarea {
             width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
+            padding: 0.75rem;
+            border: none;
             border-radius: 5px;
+            font-size: 1rem;
         }
 
         .form-group textarea { height: 150px; }
 
-        .cta-button {
-            display: inline-block;
-            background-color: var(--primary-color);
-            color: #fff;
-            padding: 0.75rem 1.5rem;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .cta-button:hover {
-            background-color: var(--accent-color);
-        }
-
         /* Footer */
         footer {
-            background-color: var(--primary-color);
-            color: #fff;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
             padding: 2rem 0;
             text-align: center;
+            font-size: 0.9rem;
         }
 
         .social-links { margin-top: 1rem; }
 
         .social-links a {
-            color: #fff;
+            color: var(--primary-color);
             font-size: 1.5rem;
             margin: 0 0.5rem;
             transition: color 0.3s ease;
@@ -359,52 +331,20 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .nav-links { 
-                display: none;
+            .nav-links { display: none; }
+            .about-content { padding: 0 1rem; }
+            .hero h1 { font-size: 2rem; }
+            .gallery-item img { height: auto; }
+            .portfolio, .contact, .about, .testimonials {
+                padding: 2rem 1rem;
             }
+        }
 
-            .hero-content {
-                padding: 1.5rem;
-                max-width: 90%;
-            }
-
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .slideshow-arrows button {
-                font-size: 1.5rem;
-                padding: 0.5rem;
-            }
-
-            .portfolio {
-                padding: 2rem 0;
-            }
-
-            .gallery-item img {
-                height: auto;
-            }
-
-            .about-content {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .about-image, .about-text {
-                width: 100%;
-            }
-
-            .contact {
-                padding: 2rem 0;
-            }
-
-            .contact-form {
-                padding: 0 1rem;
-            }
-
-            footer {
-                padding: 1rem 0;
-            }
+        @media (max-width: 480px) {
+            h1 { font-size: 1.75rem; }
+            h2 { font-size: 1.5rem; }
+            h3 { font-size: 1.25rem; }
+            .cta-button { padding: 0.5rem 1rem; }
         }
     </style>
 </head>
@@ -416,6 +356,7 @@
                 <li><a href="#home">Home</a></li>
                 <li><a href="#portfolio">Portfolio</a></li>
                 <li><a href="#about">About</a></li>
+                <li><a href="#testimonials">Testimonials</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
         </nav>
@@ -423,37 +364,10 @@
 
     <main>
         <section id="home" class="hero">
-            <div class="slideshow">
-                <div class="slide active" style="background-image: url('/api/placeholder/1200/800');">
-                    <div class="hero-content">
-                        <h1>Capturing Life's Beautiful Moments</h1>
-                        <p>Professional photography for portraits, landscapes, and events</p>
-                        <a href="#contact" class="cta-button">Book a Session</a>
-                    </div>
-                </div>
-                <div class="slide" style="background-image: url('/api/placeholder/1200/800');">
-                    <div class="hero-content">
-                        <h1>Timeless Portraits</h1>
-                        <p>Capturing your essence in every frame</p>
-                        <a href="#portfolio" class="cta-button">View Portfolio</a>
-                    </div>
-                </div>
-                <div class="slide" style="background-image: url('/api/placeholder/1200/800');">
-                    <div class="hero-content">
-                        <h1>Breathtaking Landscapes</h1>
-                        <p>Bringing nature's beauty to your walls</p>
-                        <a href="#contact" class="cta-button">Commission Art</a>
-                    </div>
-                </div>
-            </div>
-            <div class="slideshow-nav">
-                <button class="active"></button>
-                <button></button>
-                <button></button>
-            </div>
-            <div class="slideshow-arrows">
-                <button class="prev">&lt;</button>
-                <button class="next">&gt;</button>
+            <div class="hero-content">
+                <h1>Capturing Life's Beautiful Moments</h1>
+                <p>Professional photography for portraits, landscapes, and events</p>
+                <a href="#contact" class="cta-button">Book a Session</a>
             </div>
         </section>
 
@@ -478,15 +392,31 @@
         </section>
 
         <section id="about" class="about">
+            <div class="about-content container">
+                <h2>About Judith</h2>
+                <p>Hi, I'm Judith! I've been passionate about photography for over a decade. My journey began with capturing the beauty of nature, and it has since evolved into a professional career where I specialize in portraits, landscapes, and event photography.</p>
+                <p>My goal is to create timeless images that tell your unique story. Whether it's a wedding, a family portrait, or a breathtaking landscape, I strive to capture the essence of the moment in every shot.</p>
+            </div>
+            <div class="about-image">
+                <img src="/api/placeholder/400/400" alt="Judith, the photographer">
+            </div>
+        </section>
+
+        <section id="testimonials" class="testimonials">
             <div class="container">
-                <div class="about-content">
-                    <div class="about-image">
-                        <img src="/api/placeholder/400/400" alt="Judith, the photographer">
+                <h2>What Clients Are Saying</h2>
+                <div class="testimonial-cards">
+                    <div class="testimonial-card">
+                        <p>"Judith's work is simply stunning. She captured our wedding day perfectly. We couldn't be happier!"</p>
+                        <p class="client-name">- Emily & John</p>
                     </div>
-                    <div class="about-text">
-                        <h2>About Judith</h2>
-                        <p>Hi, I'm Judith! I've been passionate about photography for over a decade. My journey began with capturing the beauty of nature, and it has since evolved into a professional career where I specialize in portraits, landscapes, and event photography.</p>
-                        <p>My goal is to create timeless images that tell your unique story. Whether it's a wedding, a family portrait, or a breathtaking landscape, I strive to capture the essence of the moment in every shot.</p>
+                    <div class="testimonial-card">
+                        <p>"The portraits Judith took of our family are timeless. We'll treasure them forever."</p>
+                        <p class="client-name">- Sarah T.</p>
+                    </div>
+                    <div class="testimonial-card">
+                        <p>"Judith's landscape photography is breathtaking. Her work brings nature to life in our home."</p>
+                        <p class="client-name">- Mark R.</p>
                     </div>
                 </div>
             </div>
