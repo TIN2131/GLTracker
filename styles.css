@@ -746,7 +746,7 @@ body {
     font-size: 18px;
 }
 
-/* Walk Section */
+/* Walk Section - UPDATED FOR VERTICAL LAYOUT */
 .walk-section-card {
     background: var(--gray-50);
     padding: 16px;
@@ -754,6 +754,24 @@ body {
     margin-bottom: 20px;
 }
 
+.walk-inputs-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.walk-inputs-vertical .input-group {
+    margin-bottom: 0;
+}
+
+.walk-inputs-vertical label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-600);
+    margin-bottom: 6px;
+}
+
+/* Legacy grid support (kept for backward compatibility) */
 .walk-inputs-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1371,13 +1389,16 @@ body {
     .card {
         padding: 24px;
     }
+
+    /* Walk inputs can go back to grid on larger screens if desired */
+    .walk-inputs-vertical {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
 }
 
 @media (min-width: 768px) {
-    .walk-inputs-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
     .filter-row {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -1396,5 +1417,21 @@ body {
         box-shadow: none;
         border: 1px solid var(--gray-300);
         page-break-inside: avoid;
+    }
+}
+
+/* Animation for removing elements */
+@keyframes slideOut {
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+
+/* Animation for toast out */
+@keyframes toastOut {
+    to {
+        opacity: 0;
+        transform: translateY(20px);
     }
 }
