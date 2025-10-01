@@ -22,6 +22,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 </head>
 <body>
     <!-- Splash Screen -->
@@ -388,13 +389,14 @@
                             </div>
                             <div class="filter-row">
                                 <select id="filterMealType">
-                                    <option value="">All Types</option>
-                                    <option value="Breakfast">Breakfast</option>
-                                    <option value="Lunch">Lunch</option>
-                                    <option value="Dinner">Dinner</option>
-                                    <option value="Snack">Snack</option>
-                                    <option value="Bedtime Snack">Bedtime Snack</option>
-                                </select>
+    <option value="">All Types</option>
+    <option value="Breakfast">Breakfast</option>
+    <option value="Lunch">Lunch</option>
+    <option value="Dinner">Dinner</option>
+    <option value="Morning Snack">Morning Snack</option>
+    <option value="Afternoon Snack">Afternoon Snack</option>
+    <option value="Bedtime Snack">Bedtime Snack</option>
+</select>
                             </div>
                             <div class="filter-actions">
                                 <button class="btn btn-secondary" id="clearFiltersBtn">Clear</button>
