@@ -96,25 +96,21 @@
 
         <!-- Navigation Tabs -->
         <nav class="main-nav">
-            <button class="nav-btn active" data-section="dashboard">
-                <i class="lucide-layout-dashboard"></i>
-                <span>Dashboard</span>
-            </button>
-            <button class="nav-btn" data-section="tracking">
-                <i class="lucide-plus-circle"></i>
+            <button class="nav-btn active" data-section="tracking">
+                <i class="lucide-edit-3"></i>
                 <span>Log Entry</span>
             </button>
-            <button class="nav-btn" data-section="analytics">
-                <i class="lucide-bar-chart-3"></i>
-                <span>Analytics</span>
+            <button class="nav-btn" data-section="dashboard">
+                <i class="lucide-home"></i>
+                <span>Today</span>
             </button>
             <button class="nav-btn" data-section="history">
-                <i class="lucide-clock-3"></i>
+                <i class="lucide-calendar"></i>
                 <span>History</span>
             </button>
-            <button class="nav-btn" data-section="tools">
-                <i class="lucide-wrench"></i>
-                <span>Tools</span>
+            <button class="nav-btn" data-section="insights">
+                <i class="lucide-trending-up"></i>
+                <span>Insights</span>
             </button>
         </nav>
 
@@ -200,314 +196,215 @@
             </section>
 
             <!-- Tracking Section -->
-            <section id="tracking" class="content-section">
+            <section id="tracking" class="content-section active">
                 <div class="content-wrapper">
                     
-                    <!-- Entry Type Selector -->
-                    <div class="entry-type-selector">
-                        <button class="type-btn active" data-entry="glucose">
-                            <i class="lucide-droplet"></i>
-                            Glucose
-                        </button>
-                        <button class="type-btn" data-entry="meal">
-                            <i class="lucide-utensils"></i>
-                            Meal
-                        </button>
-                        <button class="type-btn" data-entry="exercise">
-                            <i class="lucide-footprints"></i>
-                            Exercise
-                        </button>
-                    </div>
-
-                    <!-- Glucose Entry Form -->
-                    <div id="glucoseEntry" class="entry-form active">
-                        <div class="card animated-card">
-                            <h2><i class="lucide-droplet"></i> Glucose Reading</h2>
-                            
-                            <div class="glucose-type-toggle">
-                                <label class="toggle-option">
-                                    <input type="radio" name="glucoseType" value="fasting" checked>
-                                    <span class="toggle-label">
-                                        <i class="lucide-sunrise"></i>
-                                        Fasting
-                                    </span>
-                                </label>
-                                <label class="toggle-option">
-                                    <input type="radio" name="glucoseType" value="postmeal">
-                                    <span class="toggle-label">
-                                        <i class="lucide-utensils"></i>
-                                        Post-Meal
-                                    </span>
-                                </label>
-                                <label class="toggle-option">
-                                    <input type="radio" name="glucoseType" value="random">
-                                    <span class="toggle-label">
-                                        <i class="lucide-clock"></i>
-                                        Random
-                                    </span>
-                                </label>
-                            </div>
-
-                            <div class="input-group modern">
-                                <label for="glucoseValue">
-                                    <i class="lucide-activity"></i> Reading (mg/dL)
-                                </label>
-                                <div class="input-with-unit">
-                                    <input type="number" id="glucoseValue" placeholder="Enter value" class="large-input">
-                                    <span class="unit">mg/dL</span>
-                                </div>
-                                <div class="glucose-range-indicator" id="glucoseRangeIndicator"></div>
-                            </div>
-
-                            <div class="input-group modern">
-                                <label for="glucoseTime">
-                                    <i class="lucide-clock"></i> Time
-                                </label>
-                                <input type="datetime-local" id="glucoseTime">
-                            </div>
-
-                            <div class="input-group modern">
-                                <label for="glucoseNotes">
-                                    <i class="lucide-message-square"></i> Notes (Optional)
-                                </label>
-                                <textarea id="glucoseNotes" rows="2" placeholder="Any observations..."></textarea>
-                            </div>
-
-                            <button class="btn btn-primary btn-large" id="saveGlucoseBtn">
-                                <i class="lucide-save"></i>
-                                Save Glucose Reading
-                            </button>
+                    <!-- Unified Daily Log Entry -->
+                    <div class="card premium-card">
+                        <div class="card-header">
+                            <h2><i class="lucide-edit-3"></i> Daily Log Entry</h2>
+                            <span class="card-date" id="entryDate"></span>
                         </div>
-                    </div>
-
-                    <!-- Meal Entry Form -->
-                    <div id="mealEntry" class="entry-form">
-                        <div class="card animated-card">
-                            <h2><i class="lucide-utensils"></i> Log Meal</h2>
-                            <form id="mealForm">
+                        
+                        <form id="unifiedEntryForm">
+                            
+                            <!-- Entry Type Tabs -->
+                            <div class="entry-type-tabs">
+                                <div class="tab-option active" data-type="meal">
+                                    <i class="lucide-utensils"></i>
+                                    <span>Meal Entry</span>
+                                </div>
+                                <div class="tab-option" data-type="glucose">
+                                    <i class="lucide-droplet"></i>
+                                    <span>Glucose Only</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Meal Entry Section -->
+                            <div id="mealEntrySection" class="entry-section active">
                                 
-                                <!-- Meal Type Visual Selector -->
-                                <div class="meal-type-selector">
-                                    <label class="meal-type-option">
-                                        <input type="radio" name="mealType" value="Breakfast" required>
-                                        <div class="meal-type-card">
+                                <!-- Meal Type Selector -->
+                                <div class="meal-type-selector-compact">
+                                    <label class="meal-radio">
+                                        <input type="radio" name="mealCategory" value="Breakfast" required>
+                                        <span class="meal-label">
                                             <i class="lucide-sunrise"></i>
-                                            <span>Breakfast</span>
-                                        </div>
+                                            Breakfast
+                                        </span>
                                     </label>
-                                    <label class="meal-type-option">
-                                        <input type="radio" name="mealType" value="Lunch">
-                                        <div class="meal-type-card">
+                                    <label class="meal-radio">
+                                        <input type="radio" name="mealCategory" value="Lunch">
+                                        <span class="meal-label">
                                             <i class="lucide-sun"></i>
-                                            <span>Lunch</span>
-                                        </div>
+                                            Lunch
+                                        </span>
                                     </label>
-                                    <label class="meal-type-option">
-                                        <input type="radio" name="mealType" value="Dinner">
-                                        <div class="meal-type-card">
+                                    <label class="meal-radio">
+                                        <input type="radio" name="mealCategory" value="Dinner">
+                                        <span class="meal-label">
                                             <i class="lucide-moon"></i>
-                                            <span>Dinner</span>
-                                        </div>
+                                            Dinner
+                                        </span>
                                     </label>
-                                    <label class="meal-type-option">
-                                        <input type="radio" name="mealType" value="Snack">
-                                        <div class="meal-type-card">
+                                    <label class="meal-radio">
+                                        <input type="radio" name="mealCategory" value="Snack">
+                                        <span class="meal-label">
                                             <i class="lucide-cookie"></i>
-                                            <span>Snack</span>
-                                        </div>
+                                            Snack
+                                        </span>
                                     </label>
                                 </div>
-
+                                
+                                <!-- Meal Description -->
                                 <div class="input-group modern">
-                                    <label for="mealDescription">
-                                        <i class="lucide-file-text"></i> Description
+                                    <label for="mealDesc">
+                                        <i class="lucide-file-text"></i> What did you eat?
                                     </label>
-                                    <textarea id="mealDescription" rows="3" placeholder="What did you eat?" required></textarea>
+                                    <textarea id="mealDesc" rows="2" placeholder="Describe your meal..." required></textarea>
                                 </div>
-
-                                <!-- Enhanced Ingredients Section -->
-                                <div class="ingredients-section">
+                                
+                                <!-- Ingredients Section (Simplified) -->
+                                <div class="input-group modern">
                                     <label>
-                                        <i class="lucide-list"></i> Ingredients & Portions
+                                        <i class="lucide-list"></i> Main ingredients & portions (optional)
                                     </label>
-                                    <div id="ingredientsList" class="ingredients-list modern">
-                                        <!-- Dynamic ingredients here -->
-                                    </div>
-                                    <div class="add-ingredient-modern">
-                                        <input type="text" id="newIngredientName" placeholder="Ingredient name">
-                                        <input type="text" id="newIngredientAmount" placeholder="Amount">
-                                        <button type="button" class="btn-icon" id="addIngredientBtn">
-                                            <i class="lucide-plus"></i>
-                                        </button>
+                                    <div id="ingredientsQuick" class="ingredients-quick">
+                                        <div class="ingredient-row">
+                                            <input type="text" placeholder="e.g., Chicken breast - 4oz" class="ingredient-quick-input">
+                                        </div>
+                                        <div class="ingredient-row">
+                                            <input type="text" placeholder="e.g., Brown rice - 1 cup" class="ingredient-quick-input">
+                                        </div>
+                                        <div class="ingredient-row">
+                                            <input type="text" placeholder="e.g., Vegetables - 2 cups" class="ingredient-quick-input">
+                                        </div>
                                     </div>
                                 </div>
-
+                                
+                                <!-- Glucose Readings Row -->
+                                <div class="glucose-row">
+                                    <div class="input-group modern half">
+                                        <label for="preMealGlucose">
+                                            <i class="lucide-droplet"></i> Pre-meal
+                                        </label>
+                                        <div class="input-with-unit">
+                                            <input type="number" id="preMealGlucose" placeholder="--">
+                                            <span class="unit">mg/dL</span>
+                                        </div>
+                                    </div>
+                                    <div class="input-group modern half">
+                                        <label for="postMealGlucoseUnified">
+                                            <i class="lucide-droplet"></i> Post-meal
+                                        </label>
+                                        <div class="input-with-unit">
+                                            <input type="number" id="postMealGlucoseUnified" placeholder="--">
+                                            <span class="unit">mg/dL</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Walk Activity -->
+                                <div class="walk-quick">
+                                    <label class="walk-check">
+                                        <input type="checkbox" id="didWalk">
+                                        <span><i class="lucide-footprints"></i> I took a post-meal walk</span>
+                                    </label>
+                                    <div id="walkDetails" class="walk-details hidden">
+                                        <input type="number" step="0.1" id="walkDist" placeholder="Distance (miles)">
+                                        <input type="number" id="walkTime" placeholder="Minutes">
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                            <!-- Glucose Only Section -->
+                            <div id="glucoseOnlySection" class="entry-section">
+                                
+                                <div class="glucose-type-selector">
+                                    <label class="glucose-radio">
+                                        <input type="radio" name="glucoseOnlyType" value="fasting" checked>
+                                        <span class="glucose-label">
+                                            <i class="lucide-sunrise"></i>
+                                            Fasting
+                                        </span>
+                                    </label>
+                                    <label class="glucose-radio">
+                                        <input type="radio" name="glucoseOnlyType" value="random">
+                                        <span class="glucose-label">
+                                            <i class="lucide-clock"></i>
+                                            Random
+                                        </span>
+                                    </label>
+                                    <label class="glucose-radio">
+                                        <input type="radio" name="glucoseOnlyType" value="bedtime">
+                                        <span class="glucose-label">
+                                            <i class="lucide-moon"></i>
+                                            Bedtime
+                                        </span>
+                                    </label>
+                                </div>
+                                
                                 <div class="input-group modern">
-                                    <label for="mealTimestamp">
+                                    <label for="glucoseOnlyValue">
+                                        <i class="lucide-droplet"></i> Glucose Reading
+                                    </label>
+                                    <div class="input-with-unit large">
+                                        <input type="number" id="glucoseOnlyValue" placeholder="Enter value" class="large-input">
+                                        <span class="unit">mg/dL</span>
+                                    </div>
+                                    <div class="glucose-indicator" id="glucoseIndicator"></div>
+                                </div>
+                                
+                            </div>
+                            
+                            <!-- Common Fields -->
+                            <div class="common-fields">
+                                <div class="input-group modern">
+                                    <label for="entryTime">
                                         <i class="lucide-clock"></i> Time
                                     </label>
-                                    <input type="datetime-local" id="mealTimestamp" required>
+                                    <input type="datetime-local" id="entryTime" required>
                                 </div>
-
-                                <!-- Collapsible Post-Meal Section -->
-                                <div class="collapsible-section">
-                                    <button type="button" class="collapsible-header" id="postMealToggle">
-                                        <span><i class="lucide-activity"></i> Post-Meal Data</span>
-                                        <i class="lucide-chevron-down"></i>
-                                    </button>
-                                    <div class="collapsible-content" id="postMealContent">
-                                        <div class="input-group modern">
-                                            <label for="postMealGlucose">
-                                                <i class="lucide-droplet"></i> Post-Meal Glucose
-                                            </label>
-                                            <div class="input-with-unit">
-                                                <input type="number" id="postMealGlucose" placeholder="Enter reading">
-                                                <span class="unit">mg/dL</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="walk-section">
-                                            <h4><i class="lucide-footprints"></i> Post-Meal Walk</h4>
-                                            <div class="walk-inputs-modern">
-                                                <div class="walk-input">
-                                                    <label>Distance</label>
-                                                    <div class="input-with-unit">
-                                                        <input type="number" step="0.1" id="walkDistance" placeholder="0.0">
-                                                        <span class="unit">mi</span>
-                                                    </div>
-                                                </div>
-                                                <div class="walk-input">
-                                                    <label>Duration</label>
-                                                    <div class="input-with-unit">
-                                                        <input type="number" id="walkDuration" placeholder="0">
-                                                        <span class="unit">min</span>
-                                                    </div>
-                                                </div>
-                                                <div class="walk-input">
-                                                    <label>Speed</label>
-                                                    <div class="input-with-unit">
-                                                        <input type="number" step="0.1" id="walkSpeed" placeholder="Auto" readonly>
-                                                        <span class="unit">mph</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
+                                
                                 <div class="input-group modern">
-                                    <label for="mealNotes">
-                                        <i class="lucide-message-square"></i> Notes (Optional)
+                                    <label for="entryNotes">
+                                        <i class="lucide-message-square"></i> Notes (optional)
                                     </label>
-                                    <textarea id="mealNotes" rows="2" placeholder="How did you feel? Any observations?"></textarea>
+                                    <textarea id="entryNotes" rows="2" placeholder="How are you feeling? Any observations?"></textarea>
                                 </div>
-
-                                <button type="submit" class="btn btn-primary btn-large">
-                                    <i class="lucide-save"></i>
-                                    Save Meal Entry
-                                </button>
-                            </form>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-large">
+                                <i class="lucide-save"></i>
+                                Save Entry
+                            </button>
+                            
+                        </form>
+                    </div>
+                    
+                    <!-- Quick Stats for Today -->
+                    <div class="card">
+                        <h3><i class="lucide-activity"></i> Today's Summary</h3>
+                        <div class="today-stats-mini">
+                            <div class="stat-mini">
+                                <span class="stat-label">Fasting</span>
+                                <span class="stat-value" id="todayFasting">--</span>
+                            </div>
+                            <div class="stat-mini">
+                                <span class="stat-label">Avg Glucose</span>
+                                <span class="stat-value" id="todayAvg">--</span>
+                            </div>
+                            <div class="stat-mini">
+                                <span class="stat-label">Meals</span>
+                                <span class="stat-value" id="todayMealsCount">0</span>
+                            </div>
+                            <div class="stat-mini">
+                                <span class="stat-label">Walking</span>
+                                <span class="stat-value" id="todayWalk">0 mi</span>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Exercise Entry Form -->
-                    <div id="exerciseEntry" class="entry-form">
-                        <div class="card animated-card">
-                            <h2><i class="lucide-footprints"></i> Log Exercise</h2>
-                            <form id="exerciseForm">
-                                <div class="exercise-type-selector">
-                                    <label class="exercise-type-option">
-                                        <input type="radio" name="exerciseType" value="Walking" checked>
-                                        <div class="exercise-type-card">
-                                            <i class="lucide-footprints"></i>
-                                            <span>Walking</span>
-                                        </div>
-                                    </label>
-                                    <label class="exercise-type-option">
-                                        <input type="radio" name="exerciseType" value="Running">
-                                        <div class="exercise-type-card">
-                                            <i class="lucide-zap"></i>
-                                            <span>Running</span>
-                                        </div>
-                                    </label>
-                                    <label class="exercise-type-option">
-                                        <input type="radio" name="exerciseType" value="Cycling">
-                                        <div class="exercise-type-card">
-                                            <i class="lucide-bike"></i>
-                                            <span>Cycling</span>
-                                        </div>
-                                    </label>
-                                    <label class="exercise-type-option">
-                                        <input type="radio" name="exerciseType" value="Other">
-                                        <div class="exercise-type-card">
-                                            <i class="lucide-dumbbell"></i>
-                                            <span>Other</span>
-                                        </div>
-                                    </label>
-                                </div>
-
-                                <div class="exercise-inputs-grid">
-                                    <div class="input-group modern">
-                                        <label for="exerciseDuration">
-                                            <i class="lucide-clock"></i> Duration
-                                        </label>
-                                        <div class="input-with-unit">
-                                            <input type="number" id="exerciseDuration" placeholder="30" required>
-                                            <span class="unit">min</span>
-                                        </div>
-                                    </div>
-                                    <div class="input-group modern">
-                                        <label for="exerciseDistance">
-                                            <i class="lucide-map-pin"></i> Distance
-                                        </label>
-                                        <div class="input-with-unit">
-                                            <input type="number" step="0.1" id="exerciseDistance" placeholder="0.0">
-                                            <span class="unit">mi</span>
-                                        </div>
-                                    </div>
-                                    <div class="input-group modern">
-                                        <label for="exerciseCalories">
-                                            <i class="lucide-flame"></i> Calories
-                                        </label>
-                                        <div class="input-with-unit">
-                                            <input type="number" id="exerciseCalories" placeholder="Auto">
-                                            <span class="unit">cal</span>
-                                        </div>
-                                    </div>
-                                    <div class="input-group modern">
-                                        <label for="exerciseIntensity">
-                                            <i class="lucide-activity"></i> Intensity
-                                        </label>
-                                        <select id="exerciseIntensity">
-                                            <option value="light">Light</option>
-                                            <option value="moderate" selected>Moderate</option>
-                                            <option value="vigorous">Vigorous</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="input-group modern">
-                                    <label for="exerciseTime">
-                                        <i class="lucide-calendar"></i> Date & Time
-                                    </label>
-                                    <input type="datetime-local" id="exerciseTime" required>
-                                </div>
-
-                                <div class="input-group modern">
-                                    <label for="exerciseNotes">
-                                        <i class="lucide-message-square"></i> Notes
-                                    </label>
-                                    <textarea id="exerciseNotes" rows="2" placeholder="How did you feel?"></textarea>
-                                </div>
-
-                                <button type="submit" class="btn btn-primary btn-large">
-                                    <i class="lucide-save"></i>
-                                    Save Exercise
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
+                    
                 </div>
             </section>
 
