@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>GlucoTrack - Health Monitoring</title>
+    <title>GlucoTrack Pro - Health Monitoring</title>
     
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://www.gstatic.com">
@@ -17,11 +17,12 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide@0.263.1/font/lucide.min.css">
     
-    <link rel="stylesheet" href="styles_final.css">
+    <link rel="stylesheet" href="styles.css">
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 </head>
 <body>
     <!-- Splash Screen -->
@@ -30,21 +31,64 @@
             <div class="app-icon-splash">
                 <i class="lucide-heart-pulse"></i>
             </div>
-            <h1>GlucoTrack</h1>
+            <h1>GlucoTrack Pro</h1>
             <div class="loading-spinner"></div>
         </div>
     </div>
 
     <!-- Main App Container -->
     <div class="app-container" id="appContainer">
-        
+        <!-- Status Bar (iOS style) -->
+        <div class="status-bar">
+            <div class="status-time" id="statusTime"></div>
+            <div class="status-icons">
+                <i class="lucide-wifi"></i>
+                <i class="lucide-battery-charging"></i>
+            </div>
+        </div>
+
         <!-- Header -->
         <header class="app-header">
             <div class="header-content">
-                <h1>GlucoTrack</h1>
+                <div class="header-main">
+                    <h1>GlucoTrack Pro</h1>
+                    <button class="profile-btn" id="profileBtn">
+                        <i class="lucide-user-circle"></i>
+                    </button>
+                </div>
                 <div class="header-date" id="currentDate"></div>
+                <div class="header-stats" id="headerStats">
+                    <div class="stat-badge">
+                        <i class="lucide-activity"></i>
+                        <span id="todayAverage">--</span>
+                    </div>
+                    <div class="stat-badge">
+                        <i class="lucide-trending-up"></i>
+                        <span id="weekTrend">--</span>
+                    </div>
+                </div>
             </div>
         </header>
+
+        <!-- Quick Actions Bar -->
+        <div class="quick-actions" id="quickActions">
+            <button class="quick-action-btn" id="quickBreakfastBtn">
+                <i class="lucide-sunrise"></i>
+                <span>Breakfast</span>
+            </button>
+            <button class="quick-action-btn" id="quickLunchBtn">
+                <i class="lucide-sun"></i>
+                <span>Lunch</span>
+            </button>
+            <button class="quick-action-btn" id="quickDinnerBtn">
+                <i class="lucide-moon"></i>
+                <span>Dinner</span>
+            </button>
+            <button class="quick-action-btn" id="quickSnackBtn">
+                <i class="lucide-cookie"></i>
+                <span>Snack</span>
+            </button>
+        </div>
 
         <!-- Main Content Area -->
         <main class="main-content">
@@ -53,59 +97,63 @@
             <section id="mealEntry" class="content-section active">
                 <div class="content-wrapper">
                     
-                    <!-- Daily Log Entry -->
-                    <div class="card">
-                        <h2><i class="lucide-edit-3"></i> Daily Log Entry</h2>
+                    <!-- Daily Log Entry Card -->
+                    <div class="card premium-card gradient-border">
+                        <div class="card-header">
+                            <h2><i class="lucide-edit-3"></i> Daily Log Entry</h2>
+                            <span class="card-date" id="entryDate"></span>
+                        </div>
                         
                         <form id="mealEntryForm">
                             
                             <!-- Meal Type Selector -->
                             <div class="meal-type-selector">
-                                <label class="meal-radio">
+                                <label class="meal-type-option">
                                     <input type="radio" name="mealCategory" value="Breakfast" required>
-                                    <span class="meal-label">
+                                    <div class="meal-type-card">
                                         <i class="lucide-sunrise"></i>
-                                        Breakfast
-                                    </span>
+                                        <span>Breakfast</span>
+                                    </div>
                                 </label>
-                                <label class="meal-radio">
+                                <label class="meal-type-option">
                                     <input type="radio" name="mealCategory" value="Lunch">
-                                    <span class="meal-label">
+                                    <div class="meal-type-card">
                                         <i class="lucide-sun"></i>
-                                        Lunch
-                                    </span>
+                                        <span>Lunch</span>
+                                    </div>
                                 </label>
-                                <label class="meal-radio">
+                                <label class="meal-type-option">
                                     <input type="radio" name="mealCategory" value="Dinner">
-                                    <span class="meal-label">
+                                    <div class="meal-type-card">
                                         <i class="lucide-moon"></i>
-                                        Dinner
-                                    </span>
+                                        <span>Dinner</span>
+                                    </div>
                                 </label>
-                                <label class="meal-radio">
+                                <label class="meal-type-option">
                                     <input type="radio" name="mealCategory" value="Snack">
-                                    <span class="meal-label">
+                                    <div class="meal-type-card">
                                         <i class="lucide-cookie"></i>
-                                        Snack
-                                    </span>
+                                        <span>Snack</span>
+                                    </div>
                                 </label>
                             </div>
                             
                             <!-- Fasting Glucose (Morning) -->
                             <div id="fastingSection" class="fasting-section hidden">
-                                <div class="input-group">
+                                <div class="input-group modern">
                                     <label for="fastingGlucose">
                                         <i class="lucide-sunrise"></i> Morning Fasting Glucose
                                     </label>
                                     <div class="input-with-unit">
-                                        <input type="number" id="fastingGlucose" placeholder="Enter value">
+                                        <input type="number" id="fastingGlucose" placeholder="Enter value" class="large-input">
                                         <span class="unit">mg/dL</span>
                                     </div>
+                                    <div class="glucose-range-indicator" id="fastingIndicator"></div>
                                 </div>
                             </div>
                             
                             <!-- Meal Description -->
-                            <div class="input-group">
+                            <div class="input-group modern">
                                 <label for="mealDescription">
                                     <i class="lucide-file-text"></i> What did you eat?
                                 </label>
@@ -117,16 +165,16 @@
                                 <label>
                                     <i class="lucide-list"></i> Ingredient Quantities
                                 </label>
-                                <div id="ingredientsList" class="ingredients-list">
+                                <div id="ingredientsList" class="ingredients-list modern">
                                     <!-- Dynamic ingredients will be added here -->
                                 </div>
-                                <button type="button" class="btn-add" id="addIngredientBtn">
+                                <button type="button" class="btn-add-ingredient" id="addIngredientBtn">
                                     <i class="lucide-plus-circle"></i> Add Ingredient
                                 </button>
                             </div>
                             
                             <!-- Post-Meal Glucose -->
-                            <div class="input-group">
+                            <div class="input-group modern">
                                 <label for="postMealGlucose">
                                     <i class="lucide-droplet"></i> Post-Meal Glucose Reading
                                 </label>
@@ -134,6 +182,7 @@
                                     <input type="number" id="postMealGlucose" placeholder="Enter value">
                                     <span class="unit">mg/dL</span>
                                 </div>
+                                <div class="glucose-range-indicator" id="postMealIndicator"></div>
                             </div>
                             
                             <!-- Post-Meal Walk -->
@@ -141,31 +190,40 @@
                                 <label>
                                     <i class="lucide-footprints"></i> Post-Meal Walk
                                 </label>
-                                <div class="walk-inputs">
+                                <div class="walk-inputs-modern">
                                     <div class="walk-input">
-                                        <input type="number" step="0.1" id="walkDistance" placeholder="Distance">
-                                        <span class="unit-label">miles</span>
+                                        <label>Distance</label>
+                                        <div class="input-with-unit">
+                                            <input type="number" step="0.1" id="walkDistance" placeholder="0.0">
+                                            <span class="unit">miles</span>
+                                        </div>
                                     </div>
                                     <div class="walk-input">
-                                        <input type="number" id="walkDuration" placeholder="Duration">
-                                        <span class="unit-label">minutes</span>
+                                        <label>Duration</label>
+                                        <div class="input-with-unit">
+                                            <input type="number" id="walkDuration" placeholder="0">
+                                            <span class="unit">minutes</span>
+                                        </div>
                                     </div>
                                     <div class="walk-input">
-                                        <input type="number" step="0.1" id="walkSpeed" placeholder="Speed" readonly>
-                                        <span class="unit-label">mph</span>
+                                        <label>Speed</label>
+                                        <div class="input-with-unit">
+                                            <input type="number" step="0.1" id="walkSpeed" placeholder="Auto" readonly>
+                                            <span class="unit">mph</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             
                             <!-- Time & Notes -->
-                            <div class="input-group">
+                            <div class="input-group modern">
                                 <label for="entryTime">
                                     <i class="lucide-clock"></i> Time
                                 </label>
                                 <input type="datetime-local" id="entryTime" required>
                             </div>
                             
-                            <div class="input-group">
+                            <div class="input-group modern">
                                 <label for="entryNotes">
                                     <i class="lucide-message-square"></i> Notes (optional)
                                 </label>
@@ -179,21 +237,47 @@
                         </form>
                     </div>
                     
-                    <!-- Today's Summary -->
-                    <div class="card summary-card">
-                        <h3><i class="lucide-activity"></i> Today's Summary</h3>
-                        <div class="today-stats">
-                            <div class="stat-item">
-                                <span class="stat-label">Entries</span>
-                                <span class="stat-value" id="todayEntries">0</span>
+                    <!-- Today's Summary Card -->
+                    <div class="card insights-card">
+                        <div class="card-header">
+                            <h3><i class="lucide-activity"></i> Today's Summary</h3>
+                        </div>
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <div class="summary-icon fasting">
+                                    <i class="lucide-sunrise"></i>
+                                </div>
+                                <div class="summary-content">
+                                    <span class="summary-label">Fasting</span>
+                                    <span class="summary-value" id="summaryFasting">--</span>
+                                </div>
                             </div>
-                            <div class="stat-item">
-                                <span class="stat-label">Avg Glucose</span>
-                                <span class="stat-value" id="todayAvgGlucose">--</span>
+                            <div class="summary-item">
+                                <div class="summary-icon meals">
+                                    <i class="lucide-utensils"></i>
+                                </div>
+                                <div class="summary-content">
+                                    <span class="summary-label">Meals</span>
+                                    <span class="summary-value" id="summaryMeals">0</span>
+                                </div>
                             </div>
-                            <div class="stat-item">
-                                <span class="stat-label">Total Walking</span>
-                                <span class="stat-value" id="todayWalking">0 mi</span>
+                            <div class="summary-item">
+                                <div class="summary-icon average">
+                                    <i class="lucide-activity"></i>
+                                </div>
+                                <div class="summary-content">
+                                    <span class="summary-label">Avg Glucose</span>
+                                    <span class="summary-value" id="summaryAverage">--</span>
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-icon walking">
+                                    <i class="lucide-footprints"></i>
+                                </div>
+                                <div class="summary-content">
+                                    <span class="summary-label">Walking</span>
+                                    <span class="summary-value" id="summaryWalking">0 mi</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -205,16 +289,46 @@
             <section id="history" class="content-section">
                 <div class="content-wrapper">
                     <div class="card">
-                        <h2><i class="lucide-calendar"></i> History</h2>
-                        
-                        <div class="filter-bar">
-                            <input type="date" id="filterStartDate" placeholder="Start Date">
-                            <input type="date" id="filterEndDate" placeholder="End Date">
-                            <button class="btn btn-secondary" id="filterBtn">Filter</button>
+                        <div class="card-header">
+                            <h2><i class="lucide-calendar"></i> History</h2>
+                            <button class="btn-icon" id="historyFilterBtn">
+                                <i class="lucide-filter"></i>
+                            </button>
                         </div>
                         
-                        <div id="historyList" class="history-list">
-                            <!-- Entries will be loaded here -->
+                        <!-- Filter Panel -->
+                        <div id="filterPanel" class="filter-panel">
+                            <div class="filter-row">
+                                <input type="date" id="filterStartDate" placeholder="Start Date">
+                                <input type="date" id="filterEndDate" placeholder="End Date">
+                            </div>
+                            <div class="filter-row">
+                                <select id="filterMealType">
+                                    <option value="">All Meals</option>
+                                    <option value="Breakfast">Breakfast</option>
+                                    <option value="Lunch">Lunch</option>
+                                    <option value="Dinner">Dinner</option>
+                                    <option value="Snack">Snack</option>
+                                </select>
+                            </div>
+                            <div class="filter-actions">
+                                <button class="btn btn-secondary" id="clearFiltersBtn">Clear</button>
+                                <button class="btn btn-primary" id="applyFiltersBtn">Apply</button>
+                            </div>
+                        </div>
+
+                        <!-- Search Bar -->
+                        <div class="search-bar">
+                            <i class="lucide-search"></i>
+                            <input type="text" id="historySearch" placeholder="Search entries...">
+                        </div>
+                        
+                        <div id="historyEntries" class="history-list">
+                            <div class="skeleton-loader">
+                                <div class="skeleton-item"></div>
+                                <div class="skeleton-item"></div>
+                                <div class="skeleton-item"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -223,36 +337,49 @@
             <!-- Shopping List Section -->
             <section id="shopping" class="content-section">
                 <div class="content-wrapper">
+                    <!-- Shopping List Card -->
                     <div class="card">
                         <h2><i class="lucide-shopping-cart"></i> Shopping List</h2>
                         
-                        <div class="add-item-bar">
-                            <input type="text" id="newShoppingItem" placeholder="Add item to shopping list...">
-                            <button class="btn btn-primary" id="addShoppingBtn">
-                                <i class="lucide-plus"></i> Add
+                        <div class="add-item-modern">
+                            <input type="text" id="newShoppingItem" placeholder="Add item to list...">
+                            <button class="btn-icon" id="addShoppingBtn">
+                                <i class="lucide-plus"></i>
                             </button>
                         </div>
                         
-                        <div id="shoppingList" class="shopping-list">
+                        <div id="shoppingList" class="shopping-list modern">
                             <!-- Shopping items will be loaded here -->
                         </div>
                     </div>
                     
-                    <!-- Recipe Ideas -->
+                    <!-- Recipe Ideas Card -->
                     <div class="card">
                         <h2><i class="lucide-book-open"></i> Meal Ideas</h2>
                         
-                        <div class="recipe-tabs">
-                            <button class="recipe-tab active" data-meal="breakfast">Breakfast</button>
-                            <button class="recipe-tab" data-meal="lunch">Lunch</button>
-                            <button class="recipe-tab" data-meal="dinner">Dinner</button>
-                            <button class="recipe-tab" data-meal="snacks">Snacks</button>
+                        <div class="recipe-tabs modern">
+                            <button class="recipe-tab active" data-recipe="breakfast">
+                                <i class="lucide-sunrise"></i>
+                                Breakfast
+                            </button>
+                            <button class="recipe-tab" data-recipe="lunch">
+                                <i class="lucide-sun"></i>
+                                Lunch
+                            </button>
+                            <button class="recipe-tab" data-recipe="dinner">
+                                <i class="lucide-moon"></i>
+                                Dinner
+                            </button>
+                            <button class="recipe-tab" data-recipe="snacks">
+                                <i class="lucide-cookie"></i>
+                                Snacks
+                            </button>
                         </div>
                         
                         <div class="recipe-content">
                             <div id="breakfast" class="recipe-section active">
-                                <div id="breakfastList" class="recipe-list"></div>
-                                <div class="add-recipe">
+                                <div id="breakfastList" class="recipe-list modern"></div>
+                                <div class="add-recipe-modern">
                                     <input type="text" id="newBreakfast" placeholder="Add breakfast idea...">
                                     <button class="btn-icon" onclick="addRecipeIdea('breakfast')">
                                         <i class="lucide-plus"></i>
@@ -261,8 +388,8 @@
                             </div>
                             
                             <div id="lunch" class="recipe-section">
-                                <div id="lunchList" class="recipe-list"></div>
-                                <div class="add-recipe">
+                                <div id="lunchList" class="recipe-list modern"></div>
+                                <div class="add-recipe-modern">
                                     <input type="text" id="newLunch" placeholder="Add lunch idea...">
                                     <button class="btn-icon" onclick="addRecipeIdea('lunch')">
                                         <i class="lucide-plus"></i>
@@ -271,8 +398,8 @@
                             </div>
                             
                             <div id="dinner" class="recipe-section">
-                                <div id="dinnerList" class="recipe-list"></div>
-                                <div class="add-recipe">
+                                <div id="dinnerList" class="recipe-list modern"></div>
+                                <div class="add-recipe-modern">
                                     <input type="text" id="newDinner" placeholder="Add dinner idea...">
                                     <button class="btn-icon" onclick="addRecipeIdea('dinner')">
                                         <i class="lucide-plus"></i>
@@ -281,8 +408,8 @@
                             </div>
                             
                             <div id="snacks" class="recipe-section">
-                                <div id="snacksList" class="recipe-list"></div>
-                                <div class="add-recipe">
+                                <div id="snacksList" class="recipe-list modern"></div>
+                                <div class="add-recipe-modern">
                                     <input type="text" id="newSnacks" placeholder="Add snack idea...">
                                     <button class="btn-icon" onclick="addRecipeIdea('snacks')">
                                         <i class="lucide-plus"></i>
@@ -297,7 +424,7 @@
         </main>
 
         <!-- Navigation Bar -->
-        <nav class="nav-bar">
+        <nav class="main-nav">
             <button class="nav-btn active" data-section="mealEntry">
                 <i class="lucide-edit-3"></i>
                 <span>Meal Entry</span>
@@ -308,14 +435,22 @@
             </button>
             <button class="nav-btn" data-section="shopping">
                 <i class="lucide-shopping-cart"></i>
-                <span>Shopping List</span>
+                <span>Shopping</span>
             </button>
         </nav>
 
+        <!-- Floating Action Button -->
+        <button class="fab" id="fabBtn">
+            <i class="lucide-plus"></i>
+        </button>
+
         <!-- Toast Container -->
         <div id="toastContainer" class="toast-container"></div>
+
+        <!-- Modal Container -->
+        <div id="modalContainer" class="modal-container"></div>
     </div>
 
-    <script src="app_final.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
