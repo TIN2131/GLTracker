@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glucose & Meal Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>🩺 Health Tracker</h1>
+            <p class="date-display" id="currentDate"></p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="main-nav">
+            <button class="nav-btn active" data-section="tracking">
+                <span class="nav-icon">📊</span>
+                <span>Tracking</span>
+            </button>
+            <button class="nav-btn" data-section="history">
+                <span class="nav-icon">📚</span>
+                <span>History</span>
+            </button>
+            <button class="nav-btn" data-section="recipes">
+                <span class="nav-icon">🍽️</span>
+                <span>Meal Ideas</span>
+            </button>
+            <button class="nav-btn" data-section="shopping">
+                <span class="nav-icon">🛒</span>
+                <span>Shopping</span>
+            </button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Tracking Section -->
+            <section id="tracking" class="content-section active">
+                <div class="content-wrapper">
+                    
+                    <!-- Fasting Glucose Card -->
+                    <div class="card fasting-card">
+                        <h2>☀️ Morning Fasting Glucose</h2>
+                        <div class="input-group">
+                            <label for="fastingGlucose">Glucose Reading (mg/dL)</label>
+                            <input type="number" id="fastingGlucose" placeholder="Enter fasting glucose">
+                            <button class="btn btn-primary" id="saveFastingBtn">Save Fasting Reading</button>
+                        </div>
+                        <div id="fastingDisplay" class="glucose-display hidden">
+                            <p>Today's Fasting: <strong id="fastingValue">--</strong> mg/dL</p>
+                        </div>
+                    </div>
+
+                    <!-- Meal Entry Card -->
+                    <div class="card meal-card">
+                        <h2>🍽️ Log a Meal</h2>
+                        <form id="mealForm">
+                            
+                            <div class="input-group">
+                                <label for="mealCategory">Meal Type</label>
+                                <select id="mealCategory" required>
+                                    <option value="">Select meal type...</option>
+                                    <option value="Breakfast">Breakfast</option>
+                                    <option value="Lunch">Lunch</option>
+                                    <option value="Dinner">Dinner</option>
+                                    <option value="Snack">Snack</option>
+                                    <option value="Bedtime Snack">Bedtime Snack</option>
+                                </select>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="mealDescription">What did you eat?</label>
+                                <textarea id="mealDescription" rows="3" placeholder="Describe your meal..." required></textarea>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="ingredients">Ingredient Quantities (Optional)</label>
+                                <textarea id="ingredients" rows="2" placeholder="e.g., 1 cup rice, 4 oz chicken..."></textarea>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="mealTimestamp">Time</label>
+                                <input type="datetime-local" id="mealTimestamp" required>
+                            </div>
+
+                            <!-- Post-Meal Walk Section -->
+                            <div class="subsection">
+                                <h3>🚶 Post-Meal Walk</h3>
+                                <div class="walk-inputs">
+                                    <div class="input-group">
+                                        <label for="walkDistance">Distance (miles)</label>
+                                        <input type="number" step="0.1" id="walkDistance" placeholder="0.0">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="walkDuration">Duration (minutes)</label>
+                                        <input type="number" id="walkDuration" placeholder="0">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="walkSpeed">Speed (mph)</label>
+                                        <input type="number" step="0.1" id="walkSpeed" placeholder="0.0" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="postMealGlucose">Post-Meal Glucose (mg/dL)</label>
+                                <input type="number" id="postMealGlucose" placeholder="Enter glucose reading">
+                            </div>
+
+                            <div class="input-group">
+                                <label for="mealNotes">Additional Notes</label>
+                                <textarea id="mealNotes" rows="2" placeholder="Any observations or feelings..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-success">💾 Save Meal Entry</button>
+                        </form>
+                    </div>
+
+                    <!-- Today's Entries -->
+                    <div class="card entries-card">
+                        <h2>📝 Today's Entries</h2>
+                        <div id="todayEntries" class="entries-list">
+                            <p class="empty-state">No entries yet today. Start logging your meals!</p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section id="history" class="content-section">
+                <div class="content-wrapper">
+                    <div class="card">
+                        <h2>📚 Historical Log</h2>
+                        
+                        <div class="filter-controls">
+                            <div class="input-group">
+                                <label for="filterStartDate">From Date</label>
+                                <input type="date" id="filterStartDate">
+                            </div>
+                            <div class="input-group">
+                                <label for="filterEndDate">To Date</label>
+                                <input type="date" id="filterEndDate">
+                            </div>
+                            <div class="input-group">
+                                <label for="filterMealType">Meal Type</label>
+                                <select id="filterMealType">
+                                    <option value="">All Meals</option>
+                                    <option value="Breakfast">Breakfast</option>
+                                    <option value="Lunch">Lunch</option>
+                                    <option value="Dinner">Dinner</option>
+                                    <option value="Snack">Snack</option>
+                                    <option value="Bedtime Snack">Bedtime Snack</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
+                            <button class="btn btn-secondary" id="clearFiltersBtn">Clear</button>
+                        </div>
+
+                        <div id="historyEntries" class="history-list">
+                            <p class="empty-state">Loading history...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recipes Section -->
+            <section id="recipes" class="content-section">
+                <div class="content-wrapper">
+                    <div class="card">
+                        <h2>🍽️ Meal Ideas & Recipes</h2>
+                        
+                        <div class="recipe-tabs">
+                            <button class="recipe-tab active" data-recipe="breakfast">Breakfast</button>
+                            <button class="recipe-tab" data-recipe="lunch">Lunch</button>
+                            <button class="recipe-tab" data-recipe="dinner">Dinner</button>
+                            <button class="recipe-tab" data-recipe="snacks">Snacks</button>
+                            <button class="recipe-tab" data-recipe="general">General Ideas</button>
+                        </div>
+
+                        <div class="recipe-content">
+                            <div id="breakfast" class="recipe-section active">
+                                <h3>🌅 Breakfast Ideas</h3>
+                                <div class="recipe-list" id="breakfastList">
+                                    <p class="empty-state">Add your breakfast ideas here!</p>
+                                </div>
+                                <div class="add-recipe">
+                                    <input type="text" id="newBreakfast" placeholder="Add a breakfast idea...">
+                                    <button class="btn btn-small" onclick="addRecipeIdea('breakfast')">Add</button>
+                                </div>
+                            </div>
+
+                            <div id="lunch" class="recipe-section">
+                                <h3>🌞 Lunch Ideas</h3>
+                                <div class="recipe-list" id="lunchList">
+                                    <p class="empty-state">Add your lunch ideas here!</p>
+                                </div>
+                                <div class="add-recipe">
+                                    <input type="text" id="newLunch" placeholder="Add a lunch idea...">
+                                    <button class="btn btn-small" onclick="addRecipeIdea('lunch')">Add</button>
+                                </div>
+                            </div>
+
+                            <div id="dinner" class="recipe-section">
+                                <h3>🌙 Dinner Ideas</h3>
+                                <div class="recipe-list" id="dinnerList">
+                                    <p class="empty-state">Add your dinner ideas here!</p>
+                                </div>
+                                <div class="add-recipe">
+                                    <input type="text" id="newDinner" placeholder="Add a dinner idea...">
+                                    <button class="btn btn-small" onclick="addRecipeIdea('dinner')">Add</button>
+                                </div>
+                            </div>
+
+                            <div id="snacks" class="recipe-section">
+                                <h3>🍪 Snack Ideas</h3>
+                                <div class="recipe-list" id="snacksList">
+                                    <p class="empty-state">Add your snack ideas here!</p>
+                                </div>
+                                <div class="add-recipe">
+                                    <input type="text" id="newSnacks" placeholder="Add a snack idea...">
+                                    <button class="btn btn-small" onclick="addRecipeIdea('snacks')">Add</button>
+                                </div>
+                            </div>
+
+                            <div id="general" class="recipe-section">
+                                <h3>💡 General Food Ideas</h3>
+                                <div class="recipe-list" id="generalList">
+                                    <p class="empty-state">Add your general food ideas here!</p>
+                                </div>
+                                <div class="add-recipe">
+                                    <input type="text" id="newGeneral" placeholder="Add a general food idea...">
+                                    <button class="btn btn-small" onclick="addRecipeIdea('general')">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Shopping Section -->
+            <section id="shopping" class="content-section">
+                <div class="content-wrapper">
+                    <div class="card">
+                        <h2>🛒 Shopping List</h2>
+                        
+                        <div class="add-item">
+                            <input type="text" id="newShoppingItem" placeholder="Add item to shopping list...">
+                            <button class="btn btn-primary" id="addShoppingBtn">Add Item</button>
+                        </div>
+
+                        <div id="shoppingList" class="shopping-list">
+                            <p class="empty-state">Your shopping list is empty.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="toast"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
