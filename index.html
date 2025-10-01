@@ -117,12 +117,26 @@
                                         </div>
                                     </label>
                                     <label class="meal-type-option">
-                                        <input type="radio" name="mealCategory" value="Snack">
-                                        <div class="meal-type-card">
-                                            <i class="lucide-cookie"></i>
-                                            <span>Snack</span>
-                                        </div>
-                                    </label>
+    <input type="radio" name="mealCategory" value="Morning Snack">
+    <div class="meal-type-card">
+        <i class="lucide-coffee"></i>
+        <span>Morning Snack</span>
+    </div>
+</label>
+<label class="meal-type-option">
+    <input type="radio" name="mealCategory" value="Afternoon Snack">
+    <div class="meal-type-card">
+        <i class="lucide-cookie"></i>
+        <span>Afternoon Snack</span>
+    </div>
+</label>
+<label class="meal-type-option">
+    <input type="radio" name="mealCategory" value="Bedtime Snack">
+    <div class="meal-type-card">
+        <i class="lucide-moon-star"></i>
+        <span>Bedtime Snack</span>
+    </div>
+</label>
                                     <label class="meal-type-option">
                                         <input type="radio" name="mealCategory" value="Bedtime Snack">
                                         <div class="meal-type-card">
@@ -168,15 +182,28 @@
                                 </div>
                                 
                                 <!-- Post-Meal Glucose -->
-                                <div class="input-group modern">
-                                    <label for="postMealGlucose">
-                                        <i class="lucide-droplet"></i> Post-Meal Glucose
-                                    </label>
-                                    <div class="input-with-unit">
-                                        <input type="number" id="postMealGlucose" placeholder="Enter reading">
-                                        <span class="unit">mg/dL</span>
-                                    </div>
-                                </div>
+<div class="subsection-card">
+    <label class="section-label">
+        <i class="lucide-droplet"></i> Post-Meal Glucose
+    </label>
+    
+    <!-- Timing Options -->
+    <div class="glucose-timing-selector" style="display: flex; gap: 12px; margin-bottom: 12px;">
+        <label style="flex: 1;">
+            <input type="radio" name="postMealTiming" value="1hour" checked style="margin-right: 6px;">
+            <span style="font-size: 14px; font-weight: 500;">1 Hour After</span>
+        </label>
+        <label style="flex: 1;">
+            <input type="radio" name="postMealTiming" value="2hour" style="margin-right: 6px;">
+            <span style="font-size: 14px; font-weight: 500;">2 Hours After</span>
+        </label>
+    </div>
+    
+    <div class="input-with-unit">
+        <input type="number" id="postMealGlucose" placeholder="Enter reading">
+        <span class="unit">mg/dL</span>
+    </div>
+</div>
                                 
                                 <!-- Post-Meal Walk - UPDATED VERTICAL LAYOUT -->
                                 <div class="walk-section-card">
