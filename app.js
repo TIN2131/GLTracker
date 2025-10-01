@@ -72,7 +72,10 @@ function initializeApp() {
     
     // Hide splash screen after animations
     setTimeout(() => {
-        document.getElementById('splashScreen').style.display = 'none';
+        const splashScreen = document.getElementById('splashScreen');
+        if (splashScreen) {
+            splashScreen.style.display = 'none';
+        }
     }, 2500);
 }
 
@@ -91,14 +94,16 @@ function updateStatusBar() {
         });
     }
     // Update every minute
-    setInterval(updateStatusBar, 60000);
+    setInterval(() => updateStatusBar(), 60000);
 }
 
 function displayCurrentDate() {
     const dateElement = document.getElementById('currentDate');
-    const today = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    dateElement.textContent = today.toLocaleDateString('en-US', options);
+    if (dateElement) {
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateElement.textContent = today.toLocaleDateString('en-US', options);
+    }
 }
 
 function setDefaultTimestamp() {
@@ -132,13 +137,19 @@ function switchToSection(sectionName) {
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+    const activeNavBtn = document.querySelector(`[data-section="${sectionName}"]`);
+    if (activeNavBtn) {
+        activeNavBtn.classList.add('active');
+    }
     
     // Update content sections
     document.querySelectorAll('.content-section').forEach(section => {
         section.classList.remove('active');
     });
-    document.getElementById(sectionName).classList.add('active');
+    const activeSection = document.getElementById(sectionName);
+    if (activeSection) {
+        activeSection.classList.add('active');
+    }
     
     // Update app state
     AppState.currentView = sectionName;
@@ -168,9 +179,11 @@ function setupEntryToggleListeners() {
             });
             
             if (type === 'meal') {
-                document.getElementById('mealEntrySection').classList.add('active');
+                const mealSection = document.getElementById('mealEntrySection');
+                if (mealSection) mealSection.classList.add('active');
             } else {
-                document.getElementById('glucoseOnlySection').classList.add('active');
+                const glucoseSection = document.getElementById('glucoseOnlySection');
+                if (glucoseSection) glucoseSection.classList.add('active');
             }
             
             vibrate(10);
@@ -199,24 +212,40 @@ function setupFormListeners() {
     document.querySelectorAll('input[name="mealCategory"]').forEach(radio => {
         radio.addEventListener('change', function() {
             const fastingSection = document.getElementById('fastingSection');
-            if (this.value === 'Breakfast') {
-                fastingSection.classList.remove('hidden');
-            } else {
-                fastingSection.classList.add('hidden');
+            if (fastingSection) {
+                if (this.value === 'Breakfast') {
+                    fastingSection.classList.remove('hidden');
+                } else {
+                    fastingSection.classList.add('hidden');
+                }
             }
         });
     });
     
     // Add ingredient button
-    document.getElementById('addIngredientBtn').addEventListener('click', addIngredientRow);
+    const addIngredientBtn = document.getElementById('addIngredientBtn');
+    if (addIngredientBtn) {
+        addIngredientBtn.addEventListener('click', addIngredientRow);
+    }
     
     // Walk calculator
     setupWalkCalculator();
     
     // Glucose monitoring
-    document.getElementById('glucoseValue')?.addEventListener('input', updateGlucoseIndicator);
-    document.getElementById('postMealGlucose')?.addEventListener('input', updatePostMealIndicator);
-    document.getElementById('fastingGlucose')?.addEventListener('input', updateFastingIndicator);
+    const glucoseValue = document.getElementById('glucoseValue');
+    if (glucoseValue) {
+        glucoseValue.addEventListener('input', updateGlucoseIndicator);
+    }
+    
+    const postMealGlucose = document.getElementById('postMealGlucose');
+    if (postMealGlucose) {
+        postMealGlucose.addEventListener('input', updatePostMealIndicator);
+    }
+    
+    const fastingGlucose = document.getElementById('fastingGlucose');
+    if (fastingGlucose) {
+        fastingGlucose.addEventListener('input', updateFastingIndicator);
+    }
 }
 
 function setupWalkCalculator() {
@@ -236,8 +265,12 @@ function setupWalkCalculator() {
         }
     }
     
-    distanceInput?.addEventListener('input', calculateSpeed);
-    durationInput?.addEventListener('input', calculateSpeed);
+    if (distanceInput) {
+        distanceInput.addEventListener('input', calculateSpeed);
+    }
+    if (durationInput) {
+        durationInput.addEventListener('input', calculateSpeed);
+    }
 }
 
 // ===================================
@@ -248,6 +281,8 @@ let ingredientCounter = 0;
 
 function addIngredientRow() {
     const container = document.getElementById('ingredientsList');
+    if (!container) return;
+    
     ingredientCounter++;
     
     const ingredientHTML = `
@@ -299,24 +334,32 @@ function saveMealEntry(e) {
         return;
     }
     
+    const mealDescription = document.getElementById('mealDescription');
+    if (!mealDescription || !mealDescription.value.trim()) {
+        showToast('Please describe your meal', 'error');
+        return;
+    }
+    
     const ingredients = collectIngredients();
     
     const mealData = {
         category: mealCategory.value,
-        description: document.getElementById('mealDescription').value,
+        description: mealDescription.value,
         ingredients: ingredients.length > 0 ? JSON.stringify(ingredients) : '',
         postMealGlucose: parseFloat(document.getElementById('postMealGlucose').value) || null,
         walkDistance: parseFloat(document.getElementById('walkDistance').value) || 0,
         walkDuration: parseFloat(document.getElementById('walkDuration').value) || 0,
         walkSpeed: parseFloat(document.getElementById('walkSpeed').value) || 0,
         timestamp: new Date(document.getElementById('mealTimestamp').value).toISOString(),
-        notes: document.getElementById('mealNotes').value,
-        date: getTodayDateString()
+        notes: document.getElementById('mealNotes').value || '',
+        date: getTodayDateString(),
+        createdAt: firebase.database.ServerValue.TIMESTAMP
     };
     
     // Add fasting glucose if breakfast
     if (mealCategory.value === 'Breakfast') {
-        const fastingGlucose = parseFloat(document.getElementById('fastingGlucose').value);
+        const fastingGlucoseInput = document.getElementById('fastingGlucose');
+        const fastingGlucose = fastingGlucoseInput ? parseFloat(fastingGlucoseInput.value) : null;
         if (fastingGlucose) {
             mealData.fastingGlucose = fastingGlucose;
             // Save to separate fasting collection
@@ -334,7 +377,10 @@ function saveMealEntry(e) {
             // Clear form
             document.getElementById('mealForm').reset();
             document.getElementById('ingredientsList').innerHTML = '';
-            document.getElementById('fastingSection').classList.add('hidden');
+            const fastingSection = document.getElementById('fastingSection');
+            if (fastingSection) {
+                fastingSection.classList.add('hidden');
+            }
             setDefaultTimestamp();
             
             // Update summary
@@ -344,6 +390,7 @@ function saveMealEntry(e) {
             AppState.cache.todayData = null;
         })
         .catch(error => {
+            console.error('Error saving meal:', error);
             showToast('Error saving meal: ' + error.message, 'error');
         });
 }
@@ -351,8 +398,15 @@ function saveMealEntry(e) {
 function saveGlucoseEntry(e) {
     e.preventDefault();
     
-    const glucoseType = document.querySelector('input[name="glucoseType"]:checked').value;
-    const glucoseValue = parseFloat(document.getElementById('glucoseValue').value);
+    const glucoseType = document.querySelector('input[name="glucoseType"]:checked');
+    const glucoseValueInput = document.getElementById('glucoseValue');
+    
+    if (!glucoseType) {
+        showToast('Please select a glucose type', 'error');
+        return;
+    }
+    
+    const glucoseValue = glucoseValueInput ? parseFloat(glucoseValueInput.value) : null;
     
     if (!glucoseValue) {
         showToast('Please enter a glucose reading', 'error');
@@ -360,15 +414,16 @@ function saveGlucoseEntry(e) {
     }
     
     const glucoseData = {
-        type: glucoseType,
+        type: glucoseType.value,
         value: glucoseValue,
         timestamp: new Date(document.getElementById('glucoseTime').value).toISOString(),
-        notes: document.getElementById('glucoseNotes').value,
-        date: getTodayDateString()
+        notes: document.getElementById('glucoseNotes').value || '',
+        date: getTodayDateString(),
+        createdAt: firebase.database.ServerValue.TIMESTAMP
     };
     
     // Special handling for fasting glucose
-    if (glucoseType === 'fasting') {
+    if (glucoseType.value === 'fasting') {
         saveFastingGlucose(glucoseValue, glucoseData.timestamp);
     }
     
@@ -391,6 +446,7 @@ function saveGlucoseEntry(e) {
             AppState.cache.todayData = null;
         })
         .catch(error => {
+            console.error('Error saving glucose:', error);
             showToast('Error saving glucose: ' + error.message, 'error');
         });
 }
@@ -400,7 +456,10 @@ function saveFastingGlucose(value, timestamp) {
     database.ref(`users/${AppState.currentUser}/fasting/${today}`).set({
         glucose: value,
         timestamp: timestamp,
-        date: today
+        date: today,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+    }).catch(error => {
+        console.error('Error saving fasting glucose:', error);
     });
 }
 
@@ -409,10 +468,16 @@ function saveFastingGlucose(value, timestamp) {
 // ===================================
 
 function updateGlucoseIndicator() {
-    const value = parseFloat(document.getElementById('glucoseValue').value);
+    const valueInput = document.getElementById('glucoseValue');
     const indicator = document.getElementById('glucoseRangeIndicator');
     
-    if (!value || !indicator) return;
+    if (!valueInput || !indicator) return;
+    
+    const value = parseFloat(valueInput.value);
+    if (!value) {
+        indicator.style.display = 'none';
+        return;
+    }
     
     const glucoseType = document.querySelector('input[name="glucoseType"]:checked')?.value || 'random';
     const ranges = AppState.targetRanges[glucoseType];
@@ -435,7 +500,10 @@ function updateGlucoseIndicator() {
 }
 
 function updatePostMealIndicator() {
-    const value = parseFloat(document.getElementById('postMealGlucose').value);
+    const input = document.getElementById('postMealGlucose');
+    if (!input) return;
+    
+    const value = parseFloat(input.value);
     if (!value) return;
     
     const ranges = AppState.targetRanges.postMeal;
@@ -453,7 +521,10 @@ function updatePostMealIndicator() {
 }
 
 function updateFastingIndicator() {
-    const value = parseFloat(document.getElementById('fastingGlucose').value);
+    const input = document.getElementById('fastingGlucose');
+    if (!input) return;
+    
+    const value = parseFloat(input.value);
     if (!value) return;
     
     const ranges = AppState.targetRanges.fasting;
@@ -484,14 +555,24 @@ function loadTodaySummary() {
         loadTodayWalkingDistance()
     ]).then(([fasting, mealCount, avgGlucose, walkDistance]) => {
         // Update summary card
-        document.getElementById('summaryFasting').textContent = fasting ? `${fasting} mg/dL` : '--';
-        document.getElementById('summaryMeals').textContent = mealCount;
-        document.getElementById('summaryAverage').textContent = avgGlucose ? `${avgGlucose} mg/dL` : '--';
-        document.getElementById('summaryWalking').textContent = `${walkDistance} mi`;
+        const summaryFasting = document.getElementById('summaryFasting');
+        const summaryMeals = document.getElementById('summaryMeals');
+        const summaryAverage = document.getElementById('summaryAverage');
+        const summaryWalking = document.getElementById('summaryWalking');
+        
+        if (summaryFasting) summaryFasting.textContent = fasting ? `${fasting} mg/dL` : '--';
+        if (summaryMeals) summaryMeals.textContent = mealCount;
+        if (summaryAverage) summaryAverage.textContent = avgGlucose ? `${avgGlucose} mg/dL` : '--';
+        if (summaryWalking) summaryWalking.textContent = `${walkDistance} mi`;
         
         // Update header stats
-        document.getElementById('todayAverage').textContent = avgGlucose ? `${avgGlucose} mg/dL` : '--';
-        document.getElementById('todayWalking').textContent = `${walkDistance} mi`;
+        const todayAverage = document.getElementById('todayAverage');
+        const todayWalking = document.getElementById('todayWalking');
+        
+        if (todayAverage) todayAverage.textContent = avgGlucose ? `${avgGlucose} mg/dL` : '--';
+        if (todayWalking) todayWalking.textContent = `${walkDistance} mi`;
+    }).catch(error => {
+        console.error('Error loading today summary:', error);
     });
 }
 
@@ -502,6 +583,10 @@ function loadTodayFasting() {
             .then(snapshot => {
                 const data = snapshot.val();
                 resolve(data ? data.glucose : null);
+            })
+            .catch(error => {
+                console.error('Error loading fasting glucose:', error);
+                resolve(null);
             });
     });
 }
@@ -515,6 +600,10 @@ function loadTodayMealCount() {
             .once('value')
             .then(snapshot => {
                 resolve(snapshot.numChildren());
+            })
+            .catch(error => {
+                console.error('Error loading meal count:', error);
+                resolve(0);
             });
     });
 }
@@ -536,7 +625,8 @@ function loadTodayAverageGlucose() {
             const readings = [];
             
             glucoseSnapshot.forEach(child => {
-                readings.push(child.val().value);
+                const data = child.val();
+                if (data.value) readings.push(data.value);
             });
             
             mealsSnapshot.forEach(child => {
@@ -551,6 +641,9 @@ function loadTodayAverageGlucose() {
             } else {
                 resolve(null);
             }
+        }).catch(error => {
+            console.error('Error calculating average glucose:', error);
+            resolve(null);
         });
     });
 }
@@ -572,6 +665,10 @@ function loadTodayWalkingDistance() {
                     }
                 });
                 resolve(totalDistance.toFixed(1));
+            })
+            .catch(error => {
+                console.error('Error loading walking distance:', error);
+                resolve(0);
             });
     });
 }
@@ -584,16 +681,27 @@ function setupFilterListeners() {
     const filterBtn = document.getElementById('historyFilterBtn');
     const filterPanel = document.getElementById('filterPanel');
     
-    filterBtn?.addEventListener('click', () => {
-        filterPanel.classList.toggle('active');
-    });
+    if (filterBtn && filterPanel) {
+        filterBtn.addEventListener('click', () => {
+            filterPanel.classList.toggle('active');
+        });
+    }
     
-    document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
-    document.getElementById('clearFiltersBtn')?.addEventListener('click', clearFilters);
+    const applyBtn = document.getElementById('applyFiltersBtn');
+    if (applyBtn) {
+        applyBtn.addEventListener('click', applyFilters);
+    }
+    
+    const clearBtn = document.getElementById('clearFiltersBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearFilters);
+    }
 }
 
 function loadHistoryData() {
     const historyContainer = document.getElementById('historyEntries');
+    
+    if (!historyContainer) return;
     
     // Show skeleton loader
     historyContainer.innerHTML = `
@@ -636,11 +744,16 @@ function loadHistoryData() {
         entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         
         displayHistory(entries);
+    }).catch(error => {
+        console.error('Error loading history:', error);
+        historyContainer.innerHTML = '<p class="empty-state">Error loading history</p>';
     });
 }
 
 function displayHistory(entries) {
     const container = document.getElementById('historyEntries');
+    
+    if (!container) return;
     
     if (entries.length === 0) {
         container.innerHTML = '<p class="empty-state">No entries found</p>';
@@ -687,10 +800,10 @@ function createMealHistoryCard(meal) {
     return `
         <div class="history-item">
             <div class="history-header">
-                <span class="history-type">${meal.category}</span>
+                <span class="history-type">${meal.category || 'Meal'}</span>
                 <span class="history-time">${time}</span>
             </div>
-            <div class="history-description">${meal.description}</div>
+            <div class="history-description">${meal.description || ''}</div>
             ${details.length > 0 ? `<div class="history-details">${details.join('')}</div>` : ''}
             <div class="history-actions">
                 <button class="btn-delete" onclick="deleteEntry('meal', '${meal.id}')">Delete</button>
@@ -701,7 +814,7 @@ function createMealHistoryCard(meal) {
 
 function createGlucoseHistoryCard(glucose) {
     const time = formatTime(glucose.timestamp);
-    const typeLabel = glucose.type.charAt(0).toUpperCase() + glucose.type.slice(1);
+    const typeLabel = glucose.type ? glucose.type.charAt(0).toUpperCase() + glucose.type.slice(1) : 'Glucose';
     
     return `
         <div class="history-item">
@@ -719,6 +832,11 @@ function createGlucoseHistoryCard(glucose) {
 }
 
 function deleteEntry(type, id) {
+    if (!id) {
+        showToast('Error: Invalid entry ID', 'error');
+        return;
+    }
+    
     if (confirm('Are you sure you want to delete this entry?')) {
         const path = type === 'meal' ? 'meals' : 'glucose';
         database.ref(`users/${AppState.currentUser}/${path}/${id}`).remove()
@@ -728,6 +846,7 @@ function deleteEntry(type, id) {
                 loadTodaySummary();
             })
             .catch(error => {
+                console.error('Error deleting entry:', error);
                 showToast('Error deleting entry: ' + error.message, 'error');
             });
     }
@@ -739,13 +858,19 @@ function applyFilters() {
     const mealType = document.getElementById('filterMealType').value;
     
     // Apply filters to history data
-    loadHistoryData(); // You can enhance this to actually filter
+    // This is a placeholder - you can enhance this to actually filter
+    loadHistoryData();
 }
 
 function clearFilters() {
-    document.getElementById('filterStartDate').value = '';
-    document.getElementById('filterEndDate').value = '';
-    document.getElementById('filterMealType').value = '';
+    const startDateInput = document.getElementById('filterStartDate');
+    const endDateInput = document.getElementById('filterEndDate');
+    const mealTypeSelect = document.getElementById('filterMealType');
+    
+    if (startDateInput) startDateInput.value = '';
+    if (endDateInput) endDateInput.value = '';
+    if (mealTypeSelect) mealTypeSelect.value = '';
+    
     loadHistoryData();
 }
 
@@ -754,10 +879,21 @@ function clearFilters() {
 // ===================================
 
 function setupShoppingListeners() {
-    document.getElementById('addShoppingBtn')?.addEventListener('click', addShoppingItem);
-    document.getElementById('newShoppingItem')?.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') addShoppingItem();
-    });
+    const addBtn = document.getElementById('addShoppingBtn');
+    const input = document.getElementById('newShoppingItem');
+    
+    if (addBtn) {
+        addBtn.addEventListener('click', addShoppingItem);
+    }
+    
+    if (input) {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addShoppingItem();
+            }
+        });
+    }
 }
 
 function loadShoppingList() {
@@ -770,6 +906,8 @@ function loadShoppingList() {
             });
         });
         displayShoppingList(items);
+    }, error => {
+        console.error('Error loading shopping list:', error);
     });
 }
 
@@ -783,13 +921,21 @@ function displayShoppingList(items) {
         return;
     }
     
+    // Sort items: unchecked first, then by timestamp
+    items.sort((a, b) => {
+        if (a.checked !== b.checked) {
+            return a.checked ? 1 : -1;
+        }
+        return new Date(b.timestamp) - new Date(a.timestamp);
+    });
+    
     container.innerHTML = items.map(item => `
         <div class="shopping-item ${item.checked ? 'checked' : ''}">
             <input type="checkbox" 
                    class="shopping-checkbox" 
                    ${item.checked ? 'checked' : ''}
                    onchange="toggleShoppingItem('${item.id}', this.checked)">
-            <span class="shopping-text">${item.text}</span>
+            <span class="shopping-text">${item.text || ''}</span>
             <button class="shopping-delete" onclick="deleteShoppingItem('${item.id}')">
                 <i class="lucide-trash-2"></i>
             </button>
@@ -799,6 +945,8 @@ function displayShoppingList(items) {
 
 function addShoppingItem() {
     const input = document.getElementById('newShoppingItem');
+    if (!input) return;
+    
     const text = input.value.trim();
     
     if (!text) {
@@ -811,22 +959,39 @@ function addShoppingItem() {
     database.ref(`users/${AppState.currentUser}/shopping/${itemId}`).set({
         text: text,
         checked: false,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        createdAt: firebase.database.ServerValue.TIMESTAMP
     })
     .then(() => {
         input.value = '';
         showToast('Item added to shopping list', 'success');
+    })
+    .catch(error => {
+        console.error('Error adding shopping item:', error);
+        showToast('Error adding item: ' + error.message, 'error');
     });
 }
 
 function toggleShoppingItem(itemId, checked) {
-    database.ref(`users/${AppState.currentUser}/shopping/${itemId}/checked`).set(checked);
+    if (!itemId) return;
+    
+    database.ref(`users/${AppState.currentUser}/shopping/${itemId}/checked`).set(checked)
+        .catch(error => {
+            console.error('Error toggling shopping item:', error);
+            showToast('Error updating item', 'error');
+        });
 }
 
 function deleteShoppingItem(itemId) {
+    if (!itemId) return;
+    
     database.ref(`users/${AppState.currentUser}/shopping/${itemId}`).remove()
         .then(() => {
             showToast('Item removed', 'success');
+        })
+        .catch(error => {
+            console.error('Error deleting shopping item:', error);
+            showToast('Error removing item', 'error');
         });
 }
 
@@ -844,7 +1009,11 @@ function setupRecipeListeners() {
             document.querySelectorAll('.recipe-section').forEach(section => {
                 section.classList.remove('active');
             });
-            document.getElementById(recipe).classList.add('active');
+            
+            const recipeSection = document.getElementById(recipe);
+            if (recipeSection) {
+                recipeSection.classList.add('active');
+            }
         });
     });
 }
@@ -862,6 +1031,8 @@ function loadRecipes() {
                 });
             });
             displayRecipes(type, recipes);
+        }, error => {
+            console.error(`Error loading ${type} recipes:`, error);
         });
     });
 }
@@ -878,7 +1049,7 @@ function displayRecipes(type, recipes) {
     
     container.innerHTML = recipes.map(recipe => `
         <div class="recipe-item">
-            <span>${recipe.text}</span>
+            <span>${recipe.text || ''}</span>
             <button onclick="deleteRecipe('${type}', '${recipe.id}')">
                 <i class="lucide-trash-2"></i>
             </button>
@@ -887,7 +1058,11 @@ function displayRecipes(type, recipes) {
 }
 
 function addRecipeIdea(type) {
-    const input = document.getElementById(`new${type.charAt(0).toUpperCase() + type.slice(1)}`);
+    const inputId = `new${type.charAt(0).toUpperCase() + type.slice(1)}`;
+    const input = document.getElementById(inputId);
+    
+    if (!input) return;
+    
     const text = input.value.trim();
     
     if (!text) {
@@ -901,13 +1076,23 @@ function addRecipeIdea(type) {
         .then(() => {
             input.value = '';
             showToast('Recipe idea added!', 'success');
+        })
+        .catch(error => {
+            console.error('Error adding recipe:', error);
+            showToast('Error adding recipe: ' + error.message, 'error');
         });
 }
 
 function deleteRecipe(type, recipeId) {
+    if (!type || !recipeId) return;
+    
     database.ref(`users/${AppState.currentUser}/recipes/${type}/${recipeId}`).remove()
         .then(() => {
             showToast('Recipe deleted', 'success');
+        })
+        .catch(error => {
+            console.error('Error deleting recipe:', error);
+            showToast('Error deleting recipe', 'error');
         });
 }
 
@@ -917,12 +1102,19 @@ function deleteRecipe(type, recipeId) {
 
 function setupFAB() {
     const fab = document.getElementById('fabBtn');
-    fab?.addEventListener('click', () => {
-        // Quick add - switch to meal entry
-        switchToSection('mealEntry');
-        // Focus on description field
-        document.getElementById('mealDescription')?.focus();
-    });
+    if (fab) {
+        fab.addEventListener('click', () => {
+            // Quick add - switch to meal entry
+            switchToSection('mealEntry');
+            // Focus on description field after a short delay
+            setTimeout(() => {
+                const mealDescription = document.getElementById('mealDescription');
+                if (mealDescription) {
+                    mealDescription.focus();
+                }
+            }, 300);
+        });
+    }
 }
 
 // ===================================
@@ -940,6 +1132,8 @@ function setupRealtimeUpdates() {
             if (AppState.currentView === 'mealEntry') {
                 loadTodaySummary();
             }
+        }, error => {
+            console.error('Error in realtime updates:', error);
         });
 }
 
@@ -949,7 +1143,10 @@ function setupRealtimeUpdates() {
 
 function getTodayDateString() {
     const today = new Date();
-    return today.toISOString().split('T')[0]; // YYYY-MM-DD
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 function formatDate(dateString) {
@@ -969,6 +1166,8 @@ function formatTime(timestamp) {
 
 function showToast(message, type = 'success') {
     const container = document.getElementById('toastContainer');
+    
+    if (!container) return;
     
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
@@ -996,10 +1195,13 @@ function vibrate(pattern = 10) {
     }
 }
 
-// Make functions globally available
+// Make functions globally available for inline onclick handlers
 window.removeIngredient = removeIngredient;
 window.deleteEntry = deleteEntry;
 window.toggleShoppingItem = toggleShoppingItem;
 window.deleteShoppingItem = deleteShoppingItem;
 window.addRecipeIdea = addRecipeIdea;
 window.deleteRecipe = deleteRecipe;
+
+// Log initialization
+console.log('GlucoTrack Pro initialized successfully');
