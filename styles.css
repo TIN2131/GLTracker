@@ -419,9 +419,21 @@ body {
 /* Meal Type Selector */
 .meal-type-selector {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     margin-bottom: 20px;
+}
+
+@media (min-width: 480px) {
+    .meal-type-selector {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 640px) {
+    .meal-type-selector {
+        grid-template-columns: repeat(6, 1fr);
+    }
 }
 
 .meal-type-option {
@@ -468,7 +480,54 @@ body {
     gap: 10px;
     margin-bottom: 20px;
 }
+/* Glucose Timing Selector */
+.glucose-timing-selector {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+}
 
+.glucose-timing-selector label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.glucose-timing-selector label:hover {
+    border-color: var(--primary-light);
+}
+
+.glucose-timing-selector input[type="radio"] {
+    margin-right: 8px;
+    accent-color: var(--primary);
+    width: 16px;
+    height: 16px;
+}
+
+.glucose-timing-selector input[type="radio"]:checked + span {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.glucose-timing-selector label:has(input:checked) {
+    background: var(--gray-50);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Subsection card for post-meal glucose */
+.subsection-card .input-with-unit {
+    margin-top: 12px;
+}
 .glucose-type-option {
     position: relative;
 }
@@ -1376,27 +1435,6 @@ body {
     font-style: italic;
 }
 
-/* Responsive Design */
-@media (min-width: 640px) {
-    .meal-type-selector {
-        grid-template-columns: repeat(5, 1fr);
-    }
-    
-    .content-wrapper {
-        max-width: 700px;
-    }
-    
-    .card {
-        padding: 24px;
-    }
-
-    /* Walk inputs can go back to grid on larger screens if desired */
-    .walk-inputs-vertical {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-    }
-}
 
 @media (min-width: 768px) {
     .filter-row {
