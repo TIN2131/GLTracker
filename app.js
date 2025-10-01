@@ -3,19 +3,40 @@
    Premium Health Monitoring Application
    =================================== */
 
-// Firebase Configuration - REPLACE WITH YOUR CONFIG
+// Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyC_4eChrMLYjXCneG2bgIbtmAl6etlivjk",
   authDomain: "glucose-tracker-f27a1.firebaseapp.com",
-  databaseURL: "https://glucose-tracker-f27a1-default-rtdb.firebaseio.com", 
+  databaseURL: "https://glucose-tracker-f27a1-default-rtdb.firebaseio.com", // Make sure this is here
   projectId: "glucose-tracker-f27a1",
   storageBucket: "glucose-tracker-f27a1.firebasestorage.app",
   messagingSenderId: "504539261661",
   appId: "1:504539261661:web:cee45ce28dfb9740600934"
 };
 
+// Global State Management - MUST BE BEFORE ANY CODE THAT USES IT
+const AppState = {
+    currentUser: 'user1',
+    currentView: 'mealEntry',
+    cache: {
+        todayData: null,
+        historyData: null,
+        lastUpdate: null
+    },
+    settings: {
+        glucoseUnit: 'mg/dL',
+        notifications: true,
+        darkMode: false
+    },
+    targetRanges: {
+        fasting: { low: 70, high: 100 },
+        postMeal: { low: 80, high: 140 },
+        random: { low: 70, high: 140 },
+        bedtime: { low: 90, high: 120 }
+    }
+};
 
-// Initialize Firebase
+// Initialize Firebase - AFTER AppState is defined
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
@@ -39,7 +60,6 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeApp() {
     // Initialize UI
     updateStatusBar();
-   initializeAuth();
     displayCurrentDate();
     setDefaultTimestamp();
     
@@ -69,19 +89,7 @@ function initializeApp() {
     }, 2500);
 }
 
-function initializeAuth() {
-    // Enable anonymous auth for simplicity
-    firebase.auth().signInAnonymously()
-        .then(() => {
-            console.log('Signed in anonymously');
-            AppState.currentUser = firebase.auth().currentUser.uid;
-        })
-        .catch((error) => {
-            console.error('Auth error:', error);
-            // Fallback to local user ID
-            AppState.currentUser = 'user_' + Date.now();
-        });
-}
+
 // ===================================
 // UI UPDATES
 // ===================================
