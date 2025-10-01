@@ -13,31 +13,19 @@ const firebaseConfig = {
   appId: "1:504539261661:web:cee45ce28dfb9740600934"
 };
 
+
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// Global State Management
-const AppState = {
-    currentUser: 'user1',
-    currentView: 'mealEntry',
-    cache: {
-        todayData: null,
-        historyData: null,
-        lastUpdate: null
-    },
-    settings: {
-        glucoseUnit: 'mg/dL',
-        notifications: true,
-        darkMode: false
-    },
-    targetRanges: {
-        fasting: { low: 70, high: 100 },
-        postMeal: { low: 80, high: 140 },
-        random: { low: 70, high: 140 },
-        bedtime: { low: 90, high: 120 }
+// Test Firebase connection
+database.ref('.info/connected').on('value', function(snapshot) {
+    if (snapshot.val() === true) {
+        console.log('Connected to Firebase');
+    } else {
+        console.log('Not connected to Firebase');
     }
-};
+});
 
 // ===================================
 // INITIALIZATION
@@ -50,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeApp() {
     // Initialize UI
     updateStatusBar();
+   initializeAuth();
     displayCurrentDate();
     setDefaultTimestamp();
     
@@ -79,6 +68,19 @@ function initializeApp() {
     }, 2500);
 }
 
+function initializeAuth() {
+    // Enable anonymous auth for simplicity
+    firebase.auth().signInAnonymously()
+        .then(() => {
+            console.log('Signed in anonymously');
+            AppState.currentUser = firebase.auth().currentUser.uid;
+        })
+        .catch((error) => {
+            console.error('Auth error:', error);
+            // Fallback to local user ID
+            AppState.currentUser = 'user_' + Date.now();
+        });
+}
 // ===================================
 // UI UPDATES
 // ===================================
@@ -347,6 +349,7 @@ function saveMealEntry(e) {
         description: mealDescription.value,
         ingredients: ingredients.length > 0 ? JSON.stringify(ingredients) : '',
         postMealGlucose: parseFloat(document.getElementById('postMealGlucose').value) || null,
+postMealGlucoseTiming: document.querySelector('input[name="postMealTiming"]:checked')?.value || '1hour',
         walkDistance: parseFloat(document.getElementById('walkDistance').value) || 0,
         walkDuration: parseFloat(document.getElementById('walkDuration').value) || 0,
         walkSpeed: parseFloat(document.getElementById('walkSpeed').value) || 0,
@@ -394,7 +397,24 @@ function saveMealEntry(e) {
             showToast('Error saving meal: ' + error.message, 'error');
         });
 }
-
+// Debug function to test Firebase write
+window.testFirebase = function() {
+    const testData = {
+        test: true,
+        timestamp: new Date().toISOString(),
+        message: 'Test write'
+    };
+    
+    database.ref('test').set(testData)
+        .then(() => {
+            console.log('Test write successful');
+            showToast('Firebase test successful!', 'success');
+        })
+        .catch(error => {
+            console.error('Test write failed:', error);
+            showToast('Firebase test failed: ' + error.message, 'error');
+        });
+};
 function saveGlucoseEntry(e) {
     e.preventDefault();
     
@@ -791,8 +811,9 @@ function createMealHistoryCard(meal) {
     const details = [];
     
     if (meal.postMealGlucose) {
-        details.push(`<span class="history-detail"><i class="lucide-droplet"></i> ${meal.postMealGlucose} mg/dL</span>`);
-    }
+    const timing = meal.postMealGlucoseTiming === '2hour' ? '2hr' : '1hr';
+    details.push(`<span class="history-detail"><i class="lucide-droplet"></i> ${meal.postMealGlucose} mg/dL (${timing})</span>`);
+}
     if (meal.walkDistance > 0) {
         details.push(`<span class="history-detail"><i class="lucide-footprints"></i> ${meal.walkDistance} mi</span>`);
     }
