@@ -178,30 +178,30 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Post-Meal Walk -->
+                                <!-- Post-Meal Walk - UPDATED VERTICAL LAYOUT -->
                                 <div class="walk-section-card">
                                     <label class="section-label">
                                         <i class="lucide-footprints"></i> Post-Meal Walk
                                     </label>
-                                    <div class="walk-inputs-grid">
-                                        <div class="walk-input-group">
-                                            <label>Distance</label>
+                                    <div class="walk-inputs-vertical">
+                                        <div class="input-group modern">
+                                            <label for="walkDistance">Distance</label>
                                             <div class="input-with-unit">
                                                 <input type="number" step="0.1" id="walkDistance" placeholder="0.0">
                                                 <span class="unit">miles</span>
                                             </div>
                                         </div>
-                                        <div class="walk-input-group">
-                                            <label>Duration</label>
+                                        <div class="input-group modern">
+                                            <label for="walkDuration">Duration</label>
                                             <div class="input-with-unit">
                                                 <input type="number" id="walkDuration" placeholder="0">
                                                 <span class="unit">min</span>
                                             </div>
                                         </div>
-                                        <div class="walk-input-group">
-                                            <label>Speed</label>
+                                        <div class="input-group modern">
+                                            <label for="walkSpeed">Speed (auto-calculated)</label>
                                             <div class="input-with-unit">
-                                                <input type="number" step="0.1" id="walkSpeed" placeholder="Auto" readonly>
+                                                <input type="number" step="0.1" id="walkSpeed" placeholder="0.0" readonly>
                                                 <span class="unit">mph</span>
                                             </div>
                                         </div>
@@ -393,10 +393,12 @@
                     <div class="card">
                         <h2><i class="lucide-shopping-cart"></i> Shopping List</h2>
                         
+                        <!-- UPDATED Shopping List with clearer Add button -->
                         <div class="add-item-modern">
                             <input type="text" id="newShoppingItem" placeholder="Add item to shopping list...">
-                            <button class="btn-icon" id="addShoppingBtn">
+                            <button type="button" class="btn btn-primary" id="addShoppingBtn" style="padding: 12px 20px; border-radius: var(--radius-lg); display: flex; align-items: center; gap: 6px;">
                                 <i class="lucide-plus"></i>
+                                <span>Add</span>
                             </button>
                         </div>
                         
@@ -433,8 +435,9 @@
                                 <div id="breakfastList" class="recipe-list modern"></div>
                                 <div class="add-recipe-modern">
                                     <input type="text" id="newBreakfast" placeholder="Add breakfast idea...">
-                                    <button class="btn-icon" onclick="addRecipeIdea('breakfast')">
+                                    <button type="button" class="btn btn-primary" onclick="addRecipeIdea('breakfast')" style="padding: 10px 16px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 4px;">
                                         <i class="lucide-plus"></i>
+                                        <span>Add</span>
                                     </button>
                                 </div>
                             </div>
@@ -443,8 +446,9 @@
                                 <div id="lunchList" class="recipe-list modern"></div>
                                 <div class="add-recipe-modern">
                                     <input type="text" id="newLunch" placeholder="Add lunch idea...">
-                                    <button class="btn-icon" onclick="addRecipeIdea('lunch')">
+                                    <button type="button" class="btn btn-primary" onclick="addRecipeIdea('lunch')" style="padding: 10px 16px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 4px;">
                                         <i class="lucide-plus"></i>
+                                        <span>Add</span>
                                     </button>
                                 </div>
                             </div>
@@ -453,8 +457,9 @@
                                 <div id="dinnerList" class="recipe-list modern"></div>
                                 <div class="add-recipe-modern">
                                     <input type="text" id="newDinner" placeholder="Add dinner idea...">
-                                    <button class="btn-icon" onclick="addRecipeIdea('dinner')">
+                                    <button type="button" class="btn btn-primary" onclick="addRecipeIdea('dinner')" style="padding: 10px 16px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 4px;">
                                         <i class="lucide-plus"></i>
+                                        <span>Add</span>
                                     </button>
                                 </div>
                             </div>
@@ -463,8 +468,9 @@
                                 <div id="snacksList" class="recipe-list modern"></div>
                                 <div class="add-recipe-modern">
                                     <input type="text" id="newSnacks" placeholder="Add snack idea...">
-                                    <button class="btn-icon" onclick="addRecipeIdea('snacks')">
+                                    <button type="button" class="btn btn-primary" onclick="addRecipeIdea('snacks')" style="padding: 10px 16px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 4px;">
                                         <i class="lucide-plus"></i>
+                                        <span>Add</span>
                                     </button>
                                 </div>
                             </div>
