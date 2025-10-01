@@ -23,7 +23,7 @@
     --danger-light: #f87171;
     --info: #3b82f6;
     
-    /* Neutral Colors */
+    /* Neutral Colors - Softer palette */
     --gray-50: #f9fafb;
     --gray-100: #f3f4f6;
     --gray-200: #e5e7eb;
@@ -363,11 +363,13 @@ body {
 .main-nav {
     display: flex;
     background: var(--surface);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
     border-top: 1px solid var(--border-light);
     position: sticky;
     bottom: 0;
     z-index: 100;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
 }
 
 .nav-btn {
@@ -375,7 +377,7 @@ body {
     padding: 12px 8px;
     border: none;
     background: transparent;
-    color: var(--text-tertiary);
+    color: var(--gray-500);
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -408,8 +410,8 @@ body {
 }
 
 .nav-btn:hover:not(.active) {
-    color: var(--text-secondary);
-    background: var(--surface-hover);
+    color: var(--gray-600);
+    background: var(--gray-50);
 }
 
 /* Main Content */
@@ -660,9 +662,15 @@ body {
     border-radius: var(--radius-lg);
     font-size: 15px;
     font-family: inherit;
-    color: var(--text-primary);
-    background: var(--bg-primary);
+    color: var(--gray-800);  /* Fixed text color */
+    background: white;
     transition: all var(--transition-base);
+    -webkit-appearance: none;
+}
+
+.input-group input::placeholder,
+.input-group textarea::placeholder {
+    color: var(--gray-400);
 }
 
 .input-group input:focus,
@@ -671,6 +679,7 @@ body {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    color: var(--gray-900);  /* Darker on focus */
 }
 
 .input-group textarea {
@@ -1884,4 +1893,343 @@ body {
         box-shadow: none;
         border: 1px solid var(--border-medium);
     }
+}
+
+/* ===================================
+   UNIFIED DAILY LOG STYLES
+   =================================== */
+
+/* Entry Type Tabs */
+.entry-type-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    background: var(--gray-100);
+    padding: 4px;
+    border-radius: var(--radius-lg);
+}
+
+.tab-option {
+    flex: 1;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--gray-600);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.tab-option.active {
+    background: white;
+    color: var(--primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.tab-option:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.tab-option i {
+    font-size: 16px;
+}
+
+.entry-section {
+    display: none;
+}
+
+.entry-section.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Compact Meal Type Selector */
+.meal-type-selector-compact {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+@media (min-width: 480px) {
+    .meal-type-selector-compact {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.meal-radio {
+    position: relative;
+}
+
+.meal-radio input {
+    position: absolute;
+    opacity: 0;
+}
+
+.meal-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 8px;
+    background: var(--gray-50);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-600);
+}
+
+.meal-label i {
+    font-size: 20px;
+}
+
+.meal-radio input:checked + .meal-label {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    transform: scale(1.02);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Ingredients Quick Entry */
+.ingredients-quick {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ingredient-row {
+    display: flex;
+}
+
+.ingredient-quick-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    background: white;
+    color: var(--gray-800);
+}
+
+.ingredient-quick-input::placeholder {
+    color: var(--gray-400);
+}
+
+.ingredient-quick-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Glucose Row */
+.glucose-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.input-group.half {
+    margin-bottom: 0;
+}
+
+/* Walk Quick Entry */
+.walk-quick {
+    margin-bottom: 20px;
+    padding: 12px;
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+}
+
+.walk-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.walk-check input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.walk-check span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.walk-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--gray-200);
+    animation: slideDown 0.3s ease-out;
+}
+
+.walk-details.hidden {
+    display: none;
+}
+
+.walk-details input {
+    padding: 8px 12px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    background: white;
+    color: var(--gray-800);
+}
+
+.walk-details input::placeholder {
+    color: var(--gray-400);
+    font-size: 13px;
+}
+
+.walk-details input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* Glucose Only Section */
+.glucose-type-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.glucose-radio {
+    position: relative;
+}
+
+.glucose-radio input {
+    position: absolute;
+    opacity: 0;
+}
+
+.glucose-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 8px;
+    background: var(--gray-50);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-600);
+}
+
+.glucose-label i {
+    font-size: 20px;
+}
+
+.glucose-radio input:checked + .glucose-label {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    transform: scale(1.02);
+    box-shadow: var(--shadow-sm);
+}
+
+.input-with-unit.large {
+    position: relative;
+}
+
+.glucose-indicator {
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    display: none;
+}
+
+.glucose-indicator.low {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    display: block;
+}
+
+.glucose-indicator.normal {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    display: block;
+}
+
+.glucose-indicator.high {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+    display: block;
+}
+
+/* Common Fields */
+.common-fields {
+    padding-top: 20px;
+    border-top: 2px solid var(--gray-100);
+}
+
+/* Today Stats Mini */
+.today-stats-mini {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+@media (min-width: 480px) {
+    .today-stats-mini {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.stat-mini {
+    padding: 12px;
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    text-align: center;
+}
+
+.stat-mini .stat-label {
+    display: block;
+    font-size: 11px;
+    color: var(--gray-500);
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.stat-mini .stat-value {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Insights Section Styles */
+#insights {
+    padding: 16px;
+}
+
+#insights .card {
+    margin-bottom: 16px;
 }
