@@ -7,6 +7,7 @@
 const firebaseConfig = {
   apiKey: "AIzaSyC_4eChrMLYjXCneG2bgIbtmAl6etlivjk",
   authDomain: "glucose-tracker-f27a1.firebaseapp.com",
+  databaseURL: "https://glucose-tracker-f27a1-default-rtdb.firebaseio.com", 
   projectId: "glucose-tracker-f27a1",
   storageBucket: "glucose-tracker-f27a1.firebasestorage.app",
   messagingSenderId: "504539261661",
