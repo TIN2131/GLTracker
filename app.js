@@ -345,14 +345,7 @@ function saveMealEntry(e) {
         return;
     }
     
-    const mealDescription = document.getElementById('mealDescription');
-    if (!mealDescription || !mealDescription.value.trim()) {
-        showToast('Please describe your meal', 'error');
-        return;
-    }
-    
     const ingredients = collectIngredients();
-    
     const walkDistance = parseFloat(document.getElementById('walkDistance').value) || 0;
     const walkDuration = parseFloat(document.getElementById('walkDuration').value) || 0;
     const walkSpeed = parseFloat(document.getElementById('walkSpeed').value) || 0;
@@ -366,43 +359,38 @@ function saveMealEntry(e) {
         walkDuration: walkDuration,
         walkSpeed: walkSpeed,
         timestamp: new Date(document.getElementById('mealTimestamp').value).toISOString(),
-        notes: document.getElementById('mealNotes').value || '',
-        date: getTodayDateString(),
-        createdAt: firebase.database.ServerValue.TIMESTAMP
+        notes: document.getElementById('mealNotes').value,
+        date: getTodayDateString()
     };
     
     // Add fasting glucose if breakfast
     if (mealCategory.value === 'Breakfast') {
-        const fastingGlucoseInput = document.getElementById('fastingGlucose');
-        const fastingGlucose = fastingGlucoseInput ? parseFloat(fastingGlucoseInput.value) : null;
+        const fastingGlucose = parseFloat(document.getElementById('fastingGlucose').value);
         if (fastingGlucose) {
             mealData.fastingGlucose = fastingGlucose;
-            // Save to separate fasting collection
             saveFastingGlucose(fastingGlucose, mealData.timestamp);
         }
     }
     
-    const mealId = database.ref().child('meals').push().key;
+    // Check if we're editing or creating new
+    const mealId = window.editingMealId || database.ref().child('meals').push().key;
+    const isEditing = !!window.editingMealId;
     
-   console.log('Saving meal data:', mealData); // Debug line to check data
     database.ref(`users/${AppState.currentUser}/meals/${mealId}`).set(mealData)
         .then(() => {
-            console.log('Meal saved successfully with walk data:', {
-                distance: mealData.walkDistance,
-                duration: mealData.walkDuration,
-                speed: mealData.walkSpeed
-            });
             vibrate([10, 30, 10]);
-            showToast('Meal entry saved successfully!', 'success');
+            showToast(isEditing ? 'Meal updated successfully!' : 'Meal entry saved successfully!', 'success');
             
             // Clear form
             document.getElementById('mealForm').reset();
             document.getElementById('ingredientsList').innerHTML = '';
-            const fastingSection = document.getElementById('fastingSection');
-            if (fastingSection) {
-                fastingSection.classList.add('hidden');
-            }
+            document.getElementById('fastingSection').classList.add('hidden');
             setDefaultTimestamp();
+            
+            // Reset button text and clear editing ID
+            const submitBtn = document.querySelector('#mealForm button[type="submit"]');
+            submitBtn.innerHTML = '<i class="lucide-save"></i> Save Meal Entry';
+            window.editingMealId = null;
             
             // Update summary
             loadTodaySummary();
@@ -411,7 +399,6 @@ function saveMealEntry(e) {
             AppState.cache.todayData = null;
         })
         .catch(error => {
-            console.error('Error saving meal:', error);
             showToast('Error saving meal: ' + error.message, 'error');
         });
 }
@@ -436,15 +423,8 @@ window.testFirebase = function() {
 function saveGlucoseEntry(e) {
     e.preventDefault();
     
-    const glucoseType = document.querySelector('input[name="glucoseType"]:checked');
-    const glucoseValueInput = document.getElementById('glucoseValue');
-    
-    if (!glucoseType) {
-        showToast('Please select a glucose type', 'error');
-        return;
-    }
-    
-    const glucoseValue = glucoseValueInput ? parseFloat(glucoseValueInput.value) : null;
+    const glucoseType = document.querySelector('input[name="glucoseType"]:checked').value;
+    const glucoseValue = parseFloat(document.getElementById('glucoseValue').value);
     
     if (!glucoseValue) {
         showToast('Please enter a glucose reading', 'error');
@@ -452,30 +432,36 @@ function saveGlucoseEntry(e) {
     }
     
     const glucoseData = {
-        type: glucoseType.value,
+        type: glucoseType,
         value: glucoseValue,
         timestamp: new Date(document.getElementById('glucoseTime').value).toISOString(),
-        notes: document.getElementById('glucoseNotes').value || '',
-        date: getTodayDateString(),
-        createdAt: firebase.database.ServerValue.TIMESTAMP
+        notes: document.getElementById('glucoseNotes').value,
+        date: getTodayDateString()
     };
     
     // Special handling for fasting glucose
-    if (glucoseType.value === 'fasting') {
+    if (glucoseType === 'fasting') {
         saveFastingGlucose(glucoseValue, glucoseData.timestamp);
     }
     
-    const glucoseId = database.ref().child('glucose').push().key;
+    // Check if we're editing or creating new
+    const glucoseId = window.editingGlucoseId || database.ref().child('glucose').push().key;
+    const isEditing = !!window.editingGlucoseId;
     
     database.ref(`users/${AppState.currentUser}/glucose/${glucoseId}`).set(glucoseData)
         .then(() => {
             vibrate([10, 30, 10]);
-            showToast('Glucose reading saved!', 'success');
+            showToast(isEditing ? 'Glucose updated!' : 'Glucose reading saved!', 'success');
             
             // Clear form
             document.getElementById('glucoseForm').reset();
             setDefaultTimestamp();
             updateGlucoseIndicator();
+            
+            // Reset button text and clear editing ID
+            const submitBtn = document.querySelector('#glucoseForm button[type="submit"]');
+            submitBtn.innerHTML = '<i class="lucide-save"></i> Save Glucose Reading';
+            window.editingGlucoseId = null;
             
             // Update summary
             loadTodaySummary();
@@ -484,7 +470,6 @@ function saveGlucoseEntry(e) {
             AppState.cache.todayData = null;
         })
         .catch(error => {
-            console.error('Error saving glucose:', error);
             showToast('Error saving glucose: ' + error.message, 'error');
         });
 }
@@ -844,12 +829,13 @@ function createMealHistoryCard(meal) {
     return `
         <div class="history-item">
             <div class="history-header">
-                <span class="history-type">${meal.category || 'Meal'}</span>
+                <span class="history-type">${meal.category}</span>
                 <span class="history-time">${time}</span>
             </div>
-            <div class="history-description">${meal.description || ''}</div>
+            <div class="history-description">${meal.description}</div>
             ${details.length > 0 ? `<div class="history-details">${details.join('')}</div>` : ''}
             <div class="history-actions">
+                <button class="btn-edit" onclick="editMealEntry('${meal.id}')">Edit</button>
                 <button class="btn-delete" onclick="deleteEntry('meal', '${meal.id}')">Delete</button>
             </div>
         </div>
@@ -858,7 +844,7 @@ function createMealHistoryCard(meal) {
 
 function createGlucoseHistoryCard(glucose) {
     const time = formatTime(glucose.timestamp);
-    const typeLabel = glucose.type ? glucose.type.charAt(0).toUpperCase() + glucose.type.slice(1) : 'Glucose';
+    const typeLabel = glucose.type.charAt(0).toUpperCase() + glucose.type.slice(1);
     
     return `
         <div class="history-item">
@@ -869,6 +855,7 @@ function createGlucoseHistoryCard(glucose) {
             <div class="history-description">${glucose.value} mg/dL</div>
             ${glucose.notes ? `<div class="history-details">${glucose.notes}</div>` : ''}
             <div class="history-actions">
+                <button class="btn-edit" onclick="editGlucoseEntry('${glucose.id}')">Edit</button>
                 <button class="btn-delete" onclick="deleteEntry('glucose', '${glucose.id}')">Delete</button>
             </div>
         </div>
@@ -1239,8 +1226,122 @@ function vibrate(pattern = 10) {
     }
 }
 
+// ===================================
+// EDIT FUNCTIONALITY
+// ===================================
+
+function editMealEntry(mealId) {
+    // Load the meal data
+    database.ref(`users/${AppState.currentUser}/meals/${mealId}`).once('value')
+        .then(snapshot => {
+            const meal = snapshot.val();
+            if (!meal) {
+                showToast('Entry not found', 'error');
+                return;
+            }
+            
+            // Switch to meal entry section
+            switchToSection('mealEntry');
+            
+            // Make sure meal form is visible
+            document.querySelector('[data-type="meal"]').click();
+            
+            // Fill the form with existing data
+            document.querySelector(`input[name="mealCategory"][value="${meal.category}"]`).checked = true;
+            document.getElementById('mealDescription').value = meal.description || '';
+            document.getElementById('postMealGlucose').value = meal.postMealGlucose || '';
+            document.getElementById('walkDistance').value = meal.walkDistance || '';
+            document.getElementById('walkDuration').value = meal.walkDuration || '';
+            document.getElementById('walkSpeed').value = meal.walkSpeed || '';
+            document.getElementById('mealNotes').value = meal.notes || '';
+            
+            // Handle timestamp
+            const timestamp = new Date(meal.timestamp);
+            const offset = timestamp.getTimezoneOffset();
+            const localTime = new Date(timestamp.getTime() - (offset * 60 * 1000));
+            document.getElementById('mealTimestamp').value = localTime.toISOString().slice(0, 16);
+            
+            // Handle fasting glucose if breakfast
+            if (meal.category === 'Breakfast' && meal.fastingGlucose) {
+                document.getElementById('fastingSection').classList.remove('hidden');
+                document.getElementById('fastingGlucose').value = meal.fastingGlucose;
+            }
+            
+            // Handle ingredients
+            const ingredientsList = document.getElementById('ingredientsList');
+            ingredientsList.innerHTML = '';
+            if (meal.ingredients) {
+                try {
+                    const ingredients = JSON.parse(meal.ingredients);
+                    ingredients.forEach(ing => {
+                        addIngredientRow();
+                        const lastItem = ingredientsList.lastElementChild;
+                        lastItem.querySelector('.ingredient-name').value = ing.name || '';
+                        lastItem.querySelector('.ingredient-amount').value = ing.amount || '';
+                    });
+                } catch (e) {
+                    console.error('Error parsing ingredients:', e);
+                }
+            }
+            
+            // Store the ID for update
+            window.editingMealId = mealId;
+            
+            // Change button text
+            const submitBtn = document.querySelector('#mealForm button[type="submit"]');
+            submitBtn.innerHTML = '<i class="lucide-save"></i> Update Meal Entry';
+            
+            showToast('Editing meal entry', 'success');
+        });
+}
+
+function editGlucoseEntry(glucoseId) {
+    // Load the glucose data
+    database.ref(`users/${AppState.currentUser}/glucose/${glucoseId}`).once('value')
+        .then(snapshot => {
+            const glucose = snapshot.val();
+            if (!glucose) {
+                showToast('Entry not found', 'error');
+                return;
+            }
+            
+            // Switch to meal entry section
+            switchToSection('mealEntry');
+            
+            // Make sure glucose form is visible
+            document.querySelector('[data-type="glucose"]').click();
+            
+            // Fill the form
+            document.querySelector(`input[name="glucoseType"][value="${glucose.type}"]`).checked = true;
+            document.getElementById('glucoseValue').value = glucose.value;
+            document.getElementById('glucoseNotes').value = glucose.notes || '';
+            
+            // Handle timestamp
+            const timestamp = new Date(glucose.timestamp);
+            const offset = timestamp.getTimezoneOffset();
+            const localTime = new Date(timestamp.getTime() - (offset * 60 * 1000));
+            document.getElementById('glucoseTime').value = localTime.toISOString().slice(0, 16);
+            
+            // Update indicator
+            updateGlucoseIndicator();
+            
+            // Store the ID for update
+            window.editingGlucoseId = glucoseId;
+            
+            // Change button text
+            const submitBtn = document.querySelector('#glucoseForm button[type="submit"]');
+            submitBtn.innerHTML = '<i class="lucide-save"></i> Update Glucose Reading';
+            
+            showToast('Editing glucose entry', 'success');
+        });
+}
+
 // Make functions globally available for inline onclick handlers
 window.removeIngredient = removeIngredient;
+// Make functions globally available
+window.removeIngredient = removeIngredient;
+window.editMealEntry = editMealEntry;
+window.editGlucoseEntry = editGlucoseEntry;
 window.deleteEntry = deleteEntry;
 window.toggleShoppingItem = toggleShoppingItem;
 window.deleteShoppingItem = deleteShoppingItem;
