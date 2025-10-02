@@ -353,15 +353,18 @@ function saveMealEntry(e) {
     
     const ingredients = collectIngredients();
     
+    const walkDistance = parseFloat(document.getElementById('walkDistance').value) || 0;
+    const walkDuration = parseFloat(document.getElementById('walkDuration').value) || 0;
+    const walkSpeed = parseFloat(document.getElementById('walkSpeed').value) || 0;
+    
     const mealData = {
         category: mealCategory.value,
-        description: mealDescription.value,
+        description: document.getElementById('mealDescription').value,
         ingredients: ingredients.length > 0 ? JSON.stringify(ingredients) : '',
         postMealGlucose: parseFloat(document.getElementById('postMealGlucose').value) || null,
-postMealGlucoseTiming: document.querySelector('input[name="postMealTiming"]:checked')?.value || '1hour',
-        walkDistance: parseFloat(document.getElementById('walkDistance').value) || 0,
-        walkDuration: parseFloat(document.getElementById('walkDuration').value) || 0,
-        walkSpeed: parseFloat(document.getElementById('walkSpeed').value) || 0,
+        walkDistance: walkDistance,
+        walkDuration: walkDuration,
+        walkSpeed: walkSpeed,
         timestamp: new Date(document.getElementById('mealTimestamp').value).toISOString(),
         notes: document.getElementById('mealNotes').value || '',
         date: getTodayDateString(),
@@ -381,8 +384,14 @@ postMealGlucoseTiming: document.querySelector('input[name="postMealTiming"]:chec
     
     const mealId = database.ref().child('meals').push().key;
     
+   console.log('Saving meal data:', mealData); // Debug line to check data
     database.ref(`users/${AppState.currentUser}/meals/${mealId}`).set(mealData)
         .then(() => {
+            console.log('Meal saved successfully with walk data:', {
+                distance: mealData.walkDistance,
+                duration: mealData.walkDuration,
+                speed: mealData.walkSpeed
+            });
             vibrate([10, 30, 10]);
             showToast('Meal entry saved successfully!', 'success');
             
@@ -689,15 +698,15 @@ function loadTodayWalkingDistance() {
                 let totalDistance = 0;
                 snapshot.forEach(child => {
                     const meal = child.val();
-                    if (meal.walkDistance) {
-                        totalDistance += meal.walkDistance;
+                    if (meal.walkDistance && !isNaN(parseFloat(meal.walkDistance))) {
+                        totalDistance += parseFloat(meal.walkDistance);
                     }
                 });
                 resolve(totalDistance.toFixed(1));
             })
             .catch(error => {
                 console.error('Error loading walking distance:', error);
-                resolve(0);
+                resolve('0.0');
             });
     });
 }
@@ -820,11 +829,16 @@ function createMealHistoryCard(meal) {
     const details = [];
     
     if (meal.postMealGlucose) {
-    const timing = meal.postMealGlucoseTiming === '2hour' ? '2hr' : '1hr';
-    details.push(`<span class="history-detail"><i class="lucide-droplet"></i> ${meal.postMealGlucose} mg/dL (${timing})</span>`);
-}
-    if (meal.walkDistance > 0) {
+        details.push(`<span class="history-detail"><i class="lucide-droplet"></i> ${meal.postMealGlucose} mg/dL</span>`);
+    }
+    if (meal.walkDistance && meal.walkDistance > 0) {
         details.push(`<span class="history-detail"><i class="lucide-footprints"></i> ${meal.walkDistance} mi</span>`);
+    }
+    if (meal.walkDuration && meal.walkDuration > 0) {
+        details.push(`<span class="history-detail"><i class="lucide-clock"></i> ${meal.walkDuration} min</span>`);
+    }
+    if (meal.walkSpeed && meal.walkSpeed > 0) {
+        details.push(`<span class="history-detail"><i class="lucide-zap"></i> ${meal.walkSpeed} mph</span>`);
     }
     
     return `
